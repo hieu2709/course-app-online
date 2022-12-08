@@ -19,7 +19,9 @@ function MostPopularCourse({ style }) {
           <Text style={tw`font-qs-bold text-blue text-base`}>See All</Text>
         </TouchableOpacity>
       </View>
-      <TabBarCourse />
+      <View style={tw`flex-1 `}>
+        <TabBarCourse />
+      </View>
     </View>
   );
 }

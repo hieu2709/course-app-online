@@ -1,9 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import React from 'react';
+import { useState } from 'react';
+import { useCallback } from 'react';
+import { useEffect } from 'react';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
 import MyButton from '~/components/MyButton';
+import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import BottomModal from '~/modals/BottomModal';
@@ -13,6 +18,18 @@ function ItemCourse({ item, canPress = true }) {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const modalRef = useRef();
+  const [categoryName, setCategoryName] = useState('');
+  const getCategoryName = useCallback(async () => {
+    const q = query(
+      collection(db, 'category'),
+      where('categoryID', '==', item.categoryId),
+    );
+    const querySnap = await getDocs(q);
+    querySnap.forEach(d => setCategoryName(d.data().categoryName));
+  }, [item.categoryId]);
+  useEffect(() => {
+    getCategoryName();
+  }, [getCategoryName]);
   const handleBookmark = () => {
     if (item.isBookMark) {
       modalRef?.current?.open();
@@ -25,6 +42,7 @@ function ItemCourse({ item, canPress = true }) {
     if (canPress) {
       navigation.navigate('DetailCourse', {
         data: item,
+        categoryName,
       });
     }
   };
@@ -38,7 +56,7 @@ function ItemCourse({ item, canPress = true }) {
         <View style={tw`flex-row  justify-between items-center`}>
           <View style={tw`bg-blueOpacity p-2 rounded-lg`}>
             <Text style={tw`font-qs-semibold text-xs text-blue`}>
-              {item.categoryName}
+              {categoryName}
             </Text>
           </View>
           <TouchableOpacity disabled={!canPress} onPress={handleBookmark}>

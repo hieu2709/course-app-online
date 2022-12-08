@@ -60,13 +60,10 @@ function HomePage({ navigation }) {
         </View>
 
         <View style={tw`flex-1 pt-5`}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            scrollEventThrottle={16}
-            style={tw`flex-1`}>
+          <View style={tw`flex-1`}>
             <TopMentor />
             <MostPopularCourse style={tw`mt-5`} />
-          </ScrollView>
+          </View>
         </View>
       </View>
     </Container>

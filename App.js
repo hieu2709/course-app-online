@@ -10,6 +10,7 @@ import store from '~/redux/store';
 import { MenuProvider } from 'react-native-popup-menu';
 import { ThemeProvider } from '~/ThemeProvider';
 import { UserProvider } from '~/UserProvider';
+import { CourseProvider } from '~/provider/CourseProvider';
 
 export default function App() {
   const [fontsLoaded] = useFonts({

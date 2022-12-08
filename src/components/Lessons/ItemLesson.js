@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
+import { convertMintoHrs } from '~/utils';
 
 function ItemLesson({ item, style }) {
   const { theme } = useTheme();
@@ -16,14 +17,18 @@ function ItemLesson({ item, style }) {
         <View
           style={tw`w-12 h-12 bg-blueOpacity rounded-full justify-center items-center`}>
           <Text style={tw`font-qs-bold text-lg text-blue`}>
-            {item.id < 10 ? `0${item.id}` : item.id}
+            {item.lessonId < 10 ? `0${item.lessonId}` : item.lessonId}
           </Text>
         </View>
         <View style={tw`justify-between ml-4`}>
-          <Text style={tw`font-qs-bold text-base text-${theme.text}`}>
-            {item.name}
+          <Text
+            numberOfLines={1}
+            style={tw`font-qs-bold text-base  w-55 text-${theme.text}`}>
+            {item.lessonName}
           </Text>
-          <Text style={tw`font-qs-medium text-${theme.text}`}>{item.time}</Text>
+          <Text style={tw`font-qs-medium text-${theme.text}`}>
+            {convertMintoHrs(item.time)}
+          </Text>
         </View>
       </View>
       <TouchableOpacity style={tw`shadow-xl`}>

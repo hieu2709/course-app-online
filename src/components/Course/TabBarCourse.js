@@ -18,18 +18,18 @@ function TabBarCourse({ scrollEnabled }) {
     { key: 'all', title: 'All' },
     { key: 'design3d', title: '3D Design' },
     { key: 'bussiness', title: 'Bussiness' },
-    { key: 'programming', title: 'Programming' },
+    // { key: 'programming', title: 'Programming' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'all':
-        return <SceneCourse jumpTo={jumpTo} scrollEnable={scrollEnabled} />;
+        return <SceneCourse jumpTo={jumpTo} />;
       case 'design3d':
-        return <SceneCourse jumpTo={jumpTo} scrollEnable={scrollEnabled} />;
+        return <SceneCourse jumpTo={jumpTo} categoryId={1} />;
       case 'bussiness':
-        return <SceneCourse jumpTo={jumpTo} scrollEnable={scrollEnabled} />;
-      case 'programming':
-        return <SceneCourse jumpTo={jumpTo} scrollEnable={scrollEnabled} />;
+        return <SceneCourse jumpTo={jumpTo} categoryId={2} />;
+      // case 'programming':
+      //   return <SceneCourse jumpTo={jumpTo} />;
 
       default:
         return null;
@@ -56,7 +56,8 @@ function TabBarCourse({ scrollEnabled }) {
   );
   return (
     <TabView
-      style={tw`flex-1 h-200`}
+      style={tw`flex-1`}
+      sceneContainerStyle={tw`flex-1`}
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={setIndex}

@@ -24,11 +24,11 @@ function MyTabBar({ onScroll }) {
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'about':
-        return <About jumpTo={jumpTo} onScroll={onScroll} />;
+        return <About jumpTo={jumpTo} />;
       case 'lessons':
-        return <Lessons jumpTo={jumpTo} onScroll={onScroll} />;
+        return <Lessons jumpTo={jumpTo} />;
       case 'reviews':
-        return <Reviews jumpTo={jumpTo} onScroll={onScroll} />;
+        return <Reviews jumpTo={jumpTo} />;
 
       default:
         return null;
