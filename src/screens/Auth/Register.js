@@ -66,6 +66,7 @@ function Register({ navigation }) {
       navigation.navigate('FillProfile', {
         username,
         password: data?.password,
+        isRemember,
       });
     }
     setIsLoading(false);

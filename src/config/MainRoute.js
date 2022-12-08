@@ -8,7 +8,7 @@ import MyLoadingFull from '~/base/components/MyLoadingFull';
 const Stack = createStackNavigator();
 export default function MainRoute() {
   const { user: isLogin } = useUser();
-  console.log(isLogin);
+  // console.log(isLogin);
   if (isLogin == null) {
     return <MyLoadingFull text={'Loading...'} />;
   } else {
@@ -27,13 +27,15 @@ export default function MainRoute() {
               options={item.options}
             />
           ))}
-        <Stack.Screen
-          name="Homes"
-          component={BottomTabNavigation}
-          options={{
-            headerShown: false,
-          }}
-        />
+        {isLogin && (
+          <Stack.Screen
+            name="Homes"
+            component={BottomTabNavigation}
+            options={{
+              headerShown: false,
+            }}
+          />
+        )}
         {isLogin &&
           config.map(item => (
             <Stack.Screen

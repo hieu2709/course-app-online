@@ -22,7 +22,6 @@ function TopMentors() {
           </TouchableOpacity>
         }
       />
-      <View />
     </Container>
   );
 }

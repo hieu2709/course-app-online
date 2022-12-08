@@ -24,13 +24,16 @@ import MyLoadingFull from '~/base/components/MyLoadingFull';
 import MyDateTimePicker from '~/base/components/MyDateTimePicker';
 import MyDropSelectGender from './components/MyDropSelectGender';
 import AlertMessage from '~/components/AlertMessage';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '~/firebase/config';
+import useUser from '~/hooks/useUser';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function FillProfile({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
-  const { username, password } = route?.params;
+  const { setUser } = useUser();
+  const { username, password, isRemember } = route?.params;
   const modalEditAvatarRef = useRef();
   const alertRef = useRef();
   const [avatar, setAvatar] = useState(null);
@@ -53,7 +56,14 @@ function FillProfile({ navigation, route }) {
       setIsLoading(false);
     }
   };
-
+  const setUserStorage = async user => {
+    try {
+      const jsonValue = JSON.stringify(user);
+      await AsyncStorage.setItem('user', jsonValue);
+    } catch (e) {
+      console.log('error setItem:', e);
+    }
+  };
   const {
     control,
     handleSubmit,
@@ -69,23 +79,35 @@ function FillProfile({ navigation, route }) {
   const onSubmit = async data => {
     // console.log(data);
     setIsLoading(true);
-    const params = {
-      ...data,
-      username,
-      password,
-      gender: data?.gender?.key,
-    };
-    try {
-      await setDoc(doc(db, 'users', username), params);
-    } catch (e) {
-      console.log('error register', e);
+    const docRef = doc(db, 'users', '0');
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const id = docSnap?.data()?.id + 1;
+      const params = {
+        ...data,
+        username,
+        password,
+        gender: data?.gender?.key,
+        coins: 0,
+        userId: id,
+      };
+      try {
+        await setDoc(doc(db, 'users', username), params);
+        await setDoc(doc(db, 'users', '0'), { id: id });
+        if (isRemember) {
+          setUserStorage(params);
+        }
+        setIsLoading(false);
+        alertRef?.current?.openModal();
+        setTimeout(() => {
+          alertRef?.current?.closeModal();
+          setUser(params);
+        }, 2000);
+      } catch (e) {
+        console.log('error register', e);
+        setIsLoading(false);
+      }
     }
-    setIsLoading(false);
-    // alertRef?.current?.openModal();
-    // setTimeout(() => {
-    //   navigation.navigate('Homes');
-    //   alertRef?.current?.closeModal();
-    // }, 2000);
   };
   return (
     <Container>
@@ -202,6 +224,7 @@ function FillProfile({ navigation, route }) {
           />
         }
       />
+      {isLoading && <MyLoadingFull text={'Registering...'} />}
     </Container>
   );
 }

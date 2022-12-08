@@ -2563,6 +2563,16 @@
     color "^4.2.3"
     warn-once "^0.1.0"
 
+"@react-query-firebase/database@^1.0.0-dev.2":
+  version "1.0.0-dev.2"
+  resolved "https://registry.yarnpkg.com/@react-query-firebase/database/-/database-1.0.0-dev.2.tgz#dbc4bb635de3ea00ecc34e239c7e4d0292d07fc8"
+  integrity sha512-7UMWMfW5v8cUu1iBxCD77NDVsfyBZUCflifpSvboidBZn+RqqdbMj4nxdK4EFNYv6RzAqChl41oJm0h2AdOjPA==
+
+"@react-query-firebase/firestore@^1.0.0-dev.7":
+  version "1.0.0-dev.7"
+  resolved "https://registry.yarnpkg.com/@react-query-firebase/firestore/-/firestore-1.0.0-dev.7.tgz#6f5747164e03f66f34c5924e6fc51a7f03031c3d"
+  integrity sha512-DF6t4hPDZlEBKgf0XFurJpS+SmbVoMhgjQrxdPhlr3zhddcUv54hmPuSIN8htzmNCDMXFUdZWNy4fI/tJVRkgg==
+
 "@reduxjs/toolkit@^1.8.6":
   version "1.8.6"
   resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-1.8.6.tgz"
@@ -5164,7 +5174,7 @@ expo@~46.0.9:
   optionalDependencies:
     expo-error-recovery "~3.2.0"
 
-express@^4.17.1, express@^4.18.1:
+express@^4.17.1:
   version "4.18.2"
   resolved "https://registry.npmjs.org/express/-/express-4.18.2.tgz"
   integrity sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ==
