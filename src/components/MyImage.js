@@ -1,0 +1,12 @@
+import React from 'react';
+import { Image } from 'react-native';
+import tw from '~/libs/tailwind';
+
+function MyImage({ style, src }) {
+  // console.log(src);
+  return (
+    <Image style={style} source={src || require('~/assets/noavatar.png')} />
+  );
+}
+
+export default MyImage;
