@@ -6,7 +6,7 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 
 function MostPopularCourse({ style }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
   return (
     <View style={[tw`flex-1`, style]}>

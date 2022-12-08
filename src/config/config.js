@@ -1,20 +1,5 @@
 export const config = [
   {
-    name: 'Login',
-    component: require('~/screens/Auth/Login').default,
-    options: {},
-  },
-  {
-    name: 'Register',
-    component: require('~/screens/Auth/Register').default,
-    options: {},
-  },
-  {
-    name: 'FillProfile',
-    component: require('~/screens/Auth/FillProfile').default,
-    options: {},
-  },
-  {
     name: 'Search',
     component: require('~/screens/Search/Search').default,
     options: {},
@@ -37,6 +22,23 @@ export const config = [
   {
     name: 'DetailMyCourse',
     component: require('~/screens/MyCourse/DetailMyCourse').default,
+    options: {},
+  },
+];
+export const noLogin = [
+  {
+    name: 'Login',
+    component: require('~/screens/Auth/Login').default,
+    options: {},
+  },
+  {
+    name: 'Register',
+    component: require('~/screens/Auth/Register').default,
+    options: {},
+  },
+  {
+    name: 'FillProfile',
+    component: require('~/screens/Auth/FillProfile').default,
     options: {},
   },
 ];

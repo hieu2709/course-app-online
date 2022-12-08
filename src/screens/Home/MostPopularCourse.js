@@ -9,7 +9,7 @@ import Container from '~/layouts/Container';
 import Header from '~/layouts/Header';
 
 function MostPopularCourse() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
   return (
     <Container>

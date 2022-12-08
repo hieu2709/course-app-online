@@ -87,7 +87,7 @@ const listLessons = [
 ];
 
 function Lessons({ onScroll }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
   const goToAllLessons = () => {
     navigation.navigate('AllLessons');

@@ -9,7 +9,7 @@ import MyTabView from './layouts/DetailMyCourse/MyTabView';
 
 function DetailMyCourse({ navigation, route }) {
   const { data } = route.params || '';
-  const theme = useTheme();
+  const { theme } = useTheme();
   const title = data?.courseName || 'Lessons';
   return (
     <Container>

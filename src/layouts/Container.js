@@ -6,7 +6,7 @@ import tw from '~/libs/tailwind';
 
 function Container({ children }) {
   const inset = useSafeAreaInsets();
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <View style={tw`flex-1 bg-${theme.bg} overflow-hidden`}>
       <View style={tw`bg-blue h-[${inset.top}px] w-full z-1000`} />

@@ -14,7 +14,7 @@ import OnGoing from './OnGoing';
 // });
 
 function MyTabView({ onScroll }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'ongoing', title: 'Ongoing' },

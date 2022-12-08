@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import store from '~/redux/store';
 import { MenuProvider } from 'react-native-popup-menu';
 import { ThemeProvider } from '~/ThemeProvider';
+import { UserProvider } from '~/UserProvider';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,13 +25,15 @@ export default function App() {
     return (
       <RootSiblingParent>
         <ThemeProvider>
-          <SafeAreaProvider>
-            <Provider store={store}>
-              <MenuProvider>
-                <MainNavigator />
-              </MenuProvider>
-            </Provider>
-          </SafeAreaProvider>
+          <UserProvider>
+            <SafeAreaProvider>
+              <Provider store={store}>
+                <MenuProvider>
+                  <MainNavigator />
+                </MenuProvider>
+              </Provider>
+            </SafeAreaProvider>
+          </UserProvider>
         </ThemeProvider>
       </RootSiblingParent>
     );

@@ -1,15 +1,25 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 import Icon from '~/base/Icon';
 import MyImage from '~/components/MyImage';
 import useTheme from '~/hooks/useTheme';
+import useUser from '~/hooks/useUser';
 import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
 import RowSection from './components/RowSection';
 
 function Profile() {
-  const theme = useTheme();
+  const { theme } = useTheme();
+  const { user, setUser } = useUser();
+  const clearStorage = key => {
+    AsyncStorage.clear(key);
+  };
+  const logout = () => {
+    setUser(false);
+    // clearStorage('user');
+  };
   return (
     <Container>
       <View style={tw`flex-row justify-between items-center mx-5 mb-3 mt-5`}>
@@ -83,7 +93,8 @@ function Profile() {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          style={tw`flex-row justify-between items-center mx-5 py-2.5 `}>
+          style={tw`flex-row justify-between items-center mx-5 py-2.5 `}
+          onPress={logout}>
           <View style={tw`flex-row items-center`}>
             <View style={tw`w-10 justify-center`}>
               <Icon

@@ -20,7 +20,7 @@ function MyTextInput(
 ) {
   const [isFocus, setIsFocus] = useState(false);
   const [isHide, setIsHide] = useState(true);
-  const theme = useTheme();
+  const { theme } = useTheme();
   const pressEye = () => {
     setIsHide(!isHide);
   };

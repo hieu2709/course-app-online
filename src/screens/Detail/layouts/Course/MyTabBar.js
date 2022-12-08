@@ -14,7 +14,7 @@ import Reviews from './Reviews';
 // });
 
 function MyTabBar({ onScroll }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'about', title: 'About' },

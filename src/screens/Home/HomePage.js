@@ -13,17 +13,15 @@ import {
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Icon from '~/base/Icon';
 import useTheme from '~/hooks/useTheme';
+import useUser from '~/hooks/useUser';
 import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
 import MostPopularCourse from './layouts/MostPopularCourse';
 import TopMentor from './layouts/TopMentors';
-const HEADER_MAX_HEIGHT = 150; // max header height
-const HEADER_MIN_HEIGHT = 0; // min header height
-const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT; // header scrolling value
 
 function HomePage({ navigation }) {
-  const theme = useTheme();
-
+  const { theme } = useTheme();
+  const { user } = useUser();
   return (
     <Container>
       <View style={[tw`flex-1`]}>
@@ -36,10 +34,10 @@ function HomePage({ navigation }) {
               />
               <View style={tw`ml-4`}>
                 <Text style={tw`font-qs-regular text-base text-gray`}>
-                  Good Morning
+                  Hello
                 </Text>
                 <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-                  Andrew Ainsley
+                  {user?.fullname}
                 </Text>
               </View>
             </View>

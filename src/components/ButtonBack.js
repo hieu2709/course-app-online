@@ -6,7 +6,7 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 
 function ButtonBack({ style, title, iconColor, iconSize }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
   return (
     <View style={style}>

@@ -10,7 +10,7 @@ import BottomModal from '~/modals/BottomModal';
 import { formatNumber } from '~/utils';
 
 function ItemCourse({ item, canPress = true }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
   const modalRef = useRef();
   const handleBookmark = () => {

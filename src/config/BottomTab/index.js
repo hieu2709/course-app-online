@@ -5,7 +5,7 @@ import useTheme from '~/hooks/useTheme';
 
 const Tab = createBottomTabNavigator();
 function BottomTabNavigation() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{

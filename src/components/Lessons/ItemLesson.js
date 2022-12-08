@@ -5,7 +5,7 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 
 function ItemLesson({ item, style }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <View
       style={[

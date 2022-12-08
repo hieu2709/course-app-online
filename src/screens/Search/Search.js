@@ -80,7 +80,7 @@ const rateList = [
   },
 ];
 function Search({ navigation }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const [val, setValue] = useState('');
   const refFilter = useRef();
   // console.log(val);

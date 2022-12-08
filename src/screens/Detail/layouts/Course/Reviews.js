@@ -52,7 +52,7 @@ const rateList = [
 ];
 
 function Reviews() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <View style={tw`flex-1`}>
       <View style={tw`flex-1`}>

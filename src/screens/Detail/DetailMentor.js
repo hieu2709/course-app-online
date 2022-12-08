@@ -12,7 +12,7 @@ import MyTabBar from './layouts/Mentor/MyTabBar';
 
 function DetailMentor({ navigation, route }) {
   const { data } = route.params || null;
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <Container>
       <Header

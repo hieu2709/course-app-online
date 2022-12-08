@@ -14,7 +14,7 @@ import Lessons from './Lessons';
 // });
 
 function MyTabView({ onScroll }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([{ key: 'lessons', title: 'Lessons' }]);
   const renderScene = ({ route, jumpTo }) => {

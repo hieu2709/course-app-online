@@ -1,14 +1,15 @@
 import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { View, Text } from 'react-native';
 import tw from '~/libs/tailwind';
 import LoadingIcon from '../LoadingIcon';
 
-function MyLoadingFull() {
+function MyLoadingFull({ text }) {
   return (
     <View style={tw`w-full h-full  absolute items-center justify-center`}>
       <View
-        style={tw`w-40 rounded h-20 bg-[#0000001A] justify-center items-center`}>
-        <LoadingIcon style={tw`w-20 h-20`} />
+        style={tw`w-40 rounded-xl py-2 bg-[#00000080] justify-center items-center`}>
+        <LoadingIcon style={tw`w-20 py-10`} />
+        {text && <Text style={tw`font-qs-bold text-blue`}>{text}</Text>}
       </View>
     </View>
   );

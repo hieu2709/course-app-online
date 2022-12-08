@@ -8,7 +8,7 @@ import tw from '~/libs/tailwind';
 import ModalCenter from '~/modals/ModalCenter';
 
 function AlertMessage({ icon, title, message }, ref) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <ModalCenter ref={ref} touchDisable={false}>
       <View style={tw`bg-${theme.bg} p-10 items-center `}>

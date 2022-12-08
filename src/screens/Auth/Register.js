@@ -21,12 +21,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useTheme from '~/hooks/useTheme';
 import Icon from '~/base/Icon';
 import Container from '~/layouts/Container';
+import ModalSlideFromRight from '~/modals/ModalSlideFromRight';
+import MyToast from '~/base/components/MyToast';
+import { db } from '~/firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+import MyLoadingFull from '~/base/components/MyLoadingFull';
 
 function Register({ navigation }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   // console.log('theme', theme);
+  const [isLoading, setIsLoading] = useState(false);
   const inset = useSafeAreaInsets();
-
+  const toastRef = useRef();
   const [isRemember, setIsRemember] = useState(false);
   const checkBoxRef = useRef();
   const dispatch = useDispatch();
@@ -48,9 +54,23 @@ function Register({ navigation }) {
       password: '',
     },
   });
-  const onSubmit = data => {
-    navigation.navigate('FillProfile');
+  const onSubmit = async data => {
+    setIsLoading(true);
+    const username = data?.username;
+    // console.log(username);
+    const docRef = doc(db, 'users', username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      toastRef?.current?.open(false, 'Username is already exist!');
+    } else {
+      navigation.navigate('FillProfile', {
+        username,
+        password: data?.password,
+      });
+    }
+    setIsLoading(false);
   };
+
   return (
     <Container>
       <KeyboardAvoidingView
@@ -59,7 +79,8 @@ function Register({ navigation }) {
         <TouchableWithoutFeedback
           style={tw`flex-1 `}
           onPress={Keyboard.dismiss}>
-          <View style={tw`flex-1 pt-${100}px px-5`}>
+          <View style={tw`flex-1 pt-${100}px px-5 bg-${theme.bg}`}>
+            <MyToast ref={toastRef} />
             {/* <ButtonBack style={tw`mt-5`} /> */}
             <Text style={tw`font-qs-bold text-4xl text-${theme.text}`}>
               Create your
@@ -127,6 +148,7 @@ function Register({ navigation }) {
                 style={tw`mt-10`}
                 title={'Sign up'}
                 onPress={handleSubmit(onSubmit)}
+                // onPress={test}
               />
               <View style={tw`flex-row justify-center items-center mt-22`}>
                 <Text style={tw`font-qs-medium text-sm text-${theme.text}`}>
@@ -142,6 +164,7 @@ function Register({ navigation }) {
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
+      {isLoading && <MyLoadingFull text={'Please wait...'} />}
     </Container>
   );
 }

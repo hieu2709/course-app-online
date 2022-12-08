@@ -9,7 +9,7 @@ import tw from '~/libs/tailwind';
 import { formatNumber } from '~/utils';
 
 function ItemReview({ item }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const [isLike, setIsLike] = useState(false);
   const handleLike = () => {
     setIsLike(!isLike);

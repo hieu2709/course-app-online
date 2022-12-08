@@ -11,7 +11,7 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 
 function ModalCenter({ children, loading, touchDisable }, ref) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const [visible, setVisible] = useState(false);
   const scaleValue = useRef(new Animated.Value(0)).current;
   const opacityValue = useRef(new Animated.Value(0)).current;

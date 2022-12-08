@@ -6,7 +6,7 @@ import tw from '~/libs/tailwind';
 import MyImage from '../MyImage';
 
 function StudentItem({ item }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <View
       style={tw`flex-row items-center justify-between px-5 shadow bg-${theme.bg} mb-2 py-3`}>

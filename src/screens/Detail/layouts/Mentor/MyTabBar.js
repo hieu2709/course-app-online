@@ -14,7 +14,7 @@ import Students from './Students';
 // });
 
 function MyTabBar({ onScroll }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     { key: 'courses', title: 'Courses' },

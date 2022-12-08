@@ -21,16 +21,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import useTheme from '~/hooks/useTheme';
 import Icon from '~/base/Icon';
 import Container from '~/layouts/Container';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '~/firebase/config';
+import MyLoadingFull from '~/base/components/MyLoadingFull';
+import MyToast from '~/base/components/MyToast';
+import useUser from '~/hooks/useUser';
 
 function Login({ navigation }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   // console.log('theme', theme);
+  const { setUser } = useUser();
+  const toastRef = useRef();
+  const [isLoading, setIsLoading] = useState(false);
   const inset = useSafeAreaInsets();
-
   const [isRemember, setIsRemember] = useState(false);
   const checkBoxRef = useRef();
-  const dispatch = useDispatch();
-  const setUser = async user => {
+  const setUserStorage = async user => {
     try {
       const jsonValue = JSON.stringify(user);
       await AsyncStorage.setItem('user', jsonValue);
@@ -48,7 +54,27 @@ function Login({ navigation }) {
       password: '',
     },
   });
-  const onSubmit = data => {};
+  const onSubmit = async data => {
+    setIsLoading(true);
+    const username = data?.username;
+    // console.log(username);
+    const docRef = doc(db, 'users', username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      if (docSnap.data()?.password == data.password) {
+        setUser(docSnap.data());
+        if (isRemember) {
+          setUserStorage(docSnap.data());
+        }
+      } else {
+        toastRef?.current?.open(false, 'Password is not correct!');
+      }
+      // console.log(docSnap.data().password);
+    } else {
+      toastRef?.current?.open(false, 'Username is not exist!');
+    }
+    setIsLoading(false);
+  };
   return (
     <Container>
       <KeyboardAvoidingView
@@ -59,6 +85,7 @@ function Login({ navigation }) {
           onPress={Keyboard.dismiss}>
           <View style={tw`flex-1 pt-${100}px px-5 bg-${theme.bg}`}>
             {/* <ButtonBack style={tw`mt-5`} /> */}
+            <MyToast ref={toastRef} />
             <Text style={tw`font-qs-bold text-4xl text-${theme.text}`}>
               Login to your Account
             </Text>
@@ -142,6 +169,7 @@ function Login({ navigation }) {
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
+      {isLoading && <MyLoadingFull text={'Please wait...'} />}
     </Container>
   );
 }

@@ -21,7 +21,7 @@ const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT; // header 
 
 function Header({ data, handleBookmark }) {
   // console.log(scrollY);
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <View>
       <View style={tw`flex-row justify-between items-start mx-5 mt-5`}>

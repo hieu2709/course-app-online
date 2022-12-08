@@ -24,11 +24,13 @@ import MyLoadingFull from '~/base/components/MyLoadingFull';
 import MyDateTimePicker from '~/base/components/MyDateTimePicker';
 import MyDropSelectGender from './components/MyDropSelectGender';
 import AlertMessage from '~/components/AlertMessage';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '~/firebase/config';
 
-function FillProfile({ navigation }) {
+function FillProfile({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const theme = useTheme();
+  const { theme } = useTheme();
+  const { username, password } = route?.params;
   const modalEditAvatarRef = useRef();
   const alertRef = useRef();
   const [avatar, setAvatar] = useState(null);
@@ -58,22 +60,32 @@ function FillProfile({ navigation }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      username: '',
-      password: '',
+      dob: new Date(),
     },
   });
   const handleEditAvatar = () => {
     modalEditAvatarRef?.current?.openModal();
   };
-  const onChangeDate = selectedDate => {
-    setDate(selectedDate);
-  };
   const onSubmit = async data => {
-    alertRef?.current?.openModal();
-    setTimeout(() => {
-      navigation.navigate('Homes');
-      alertRef?.current?.closeModal();
-    }, 2000);
+    // console.log(data);
+    setIsLoading(true);
+    const params = {
+      ...data,
+      username,
+      password,
+      gender: data?.gender?.key,
+    };
+    try {
+      await setDoc(doc(db, 'users', username), params);
+    } catch (e) {
+      console.log('error register', e);
+    }
+    setIsLoading(false);
+    // alertRef?.current?.openModal();
+    // setTimeout(() => {
+    //   navigation.navigate('Homes');
+    //   alertRef?.current?.closeModal();
+    // }, 2000);
   };
   return (
     <Container>
@@ -108,19 +120,11 @@ function FillProfile({ navigation }) {
           <ScrollView>
             <View style={tw`flex-1 px-5 mt-5 items-center`}>
               <View style={tw`mb-5`}>
-                <Controller
-                  name="avatar"
-                  control={control}
-                  rules={{
-                    required: true,
-                  }}
-                  render={({ field: { onChange, value } }) => (
-                    <MyImage
-                      src={avatar && { uri: avatar }}
-                      style={tw`w-30 h-30 rounded-full `}
-                    />
-                  )}
+                <MyImage
+                  src={avatar && { uri: avatar }}
+                  style={tw`w-30 h-30 rounded-full `}
                 />
+
                 <TouchableOpacity
                   onPress={handleEditAvatar}
                   style={tw`bg-blue w-7 h-7 items-center justify-center rounded-lg absolute right-0 bottom-0`}>
@@ -148,20 +152,6 @@ function FillProfile({ navigation }) {
                 )}
               />
               <Controller
-                name="nickname"
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <MyTextInput
-                    placeholder={'Nickname'}
-                    onChangeText={onChange}
-                    value={value}
-                  />
-                )}
-              />
-              <Controller
                 name="dob"
                 control={control}
                 rules={{
@@ -170,42 +160,13 @@ function FillProfile({ navigation }) {
                 render={({ field: { onChange, value } }) => (
                   <MyDateTimePicker
                     ref={dobRef}
-                    value={date}
-                    onChange={d => onChangeDate(d)}
+                    value={new Date()}
+                    onChange={d => onChange(d)}
                     style={tw`w-full`}
                   />
                 )}
               />
-              <Controller
-                name="email"
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <MyTextInput
-                    placeholder={'Email'}
-                    onChangeText={onChange}
-                    value={value}
-                    type={'email-address'}
-                  />
-                )}
-              />
-              <Controller
-                name="phone"
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <MyTextInput
-                    placeholder={'Phone Number'}
-                    onChangeText={onChange}
-                    value={value}
-                    type={'number-pad'}
-                  />
-                )}
-              />
+
               <Controller
                 name="gender"
                 control={control}
@@ -226,7 +187,7 @@ function FillProfile({ navigation }) {
       <MyButton
         style={tw`mb-15 mx-5`}
         title={'Continue'}
-        onPress={() => onSubmit()}
+        onPress={handleSubmit(onSubmit)}
       />
       <AlertMessage
         ref={alertRef}

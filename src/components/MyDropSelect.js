@@ -18,7 +18,7 @@ function MyDropSelect({ value, onChange, list, selectStyle, dropStyle }) {
   const animRotate = useRef(new Animated.Value(0)).current;
   const animOpacity = useRef(new Animated.Value(0)).current;
   const animTranslateY = useRef(new Animated.Value(0)).current;
-  const theme = useTheme();
+  const { theme } = useTheme();
   const handleSelect = item => {
     onChange(item);
   };

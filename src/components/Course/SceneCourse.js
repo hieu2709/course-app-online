@@ -53,7 +53,7 @@ const listCourse = [
   },
 ];
 function SceneCourse({ scrollEnable = false }) {
-  // const theme = useTheme();
+  // const {theme} = useTheme();
   return (
     <ScrollView scrollEnabled={scrollEnable} style={tw`flex-1`}>
       {listCourse?.map((item, i) => (

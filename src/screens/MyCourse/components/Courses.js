@@ -6,7 +6,7 @@ import tw from '~/libs/tailwind';
 import { convertMintoHrs } from '~/utils';
 
 function Courses({ item }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
   const percent = (
     ((item.progress || 0) / (item.totalLesson || 1)) *

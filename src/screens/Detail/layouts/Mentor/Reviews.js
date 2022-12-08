@@ -4,7 +4,7 @@ import ItemReview from '~/components/Review/ItemReview';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 function Reviews() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <View style={tw`flex-1`}>
       <ScrollView

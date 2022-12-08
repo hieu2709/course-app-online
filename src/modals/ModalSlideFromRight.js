@@ -8,7 +8,7 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 
 function ModalSlideFromRight({ children }, ref) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const layout = useWindowDimensions();
   const [visible, setVisible] = useState(false);
   const animTranslateX = useRef(new Animated.Value(0)).current;

@@ -5,7 +5,7 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 
 function RowSection({ icon, title, onPress }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <TouchableOpacity
       onPress={onPress}

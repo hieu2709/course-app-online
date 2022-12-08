@@ -83,7 +83,7 @@ const listLessons = [
   },
 ];
 function AllLesson({ navigation, route }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const { data } = route.params || '';
   const title = data?.courseName || 'Lessons';
   return (

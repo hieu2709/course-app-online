@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
+import { useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
@@ -28,8 +29,10 @@ const listMentors = [
   },
 ];
 function TopMentor() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
+  const [list, setList] = useState([]);
+  const getListMentor = async () => {};
   const goToDetailMentor = item => {
     navigation.navigate('DetailMentor', {
       data: item,

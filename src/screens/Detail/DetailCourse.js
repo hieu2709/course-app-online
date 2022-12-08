@@ -15,7 +15,7 @@ import ButtonEnrolCourse from '~/components/ButtonEnrollCourse';
 function DetailCourse({ navigation, route }) {
   const { data } = route.params;
   const scrollY = useRef(new Animated.Value(0)).current;
-  const theme = useTheme();
+  const { theme } = useTheme();
   const modalRef = useRef();
   const handleBookmark = () => {
     if (data.isBookMark) {

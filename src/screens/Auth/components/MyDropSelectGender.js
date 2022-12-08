@@ -15,7 +15,7 @@ const listGender = [
 ];
 function MyDropSelectGender({ value, onChange }) {
   // console.log('value', value);
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <View style={tw`w-full`}>
       <MyDropSelect

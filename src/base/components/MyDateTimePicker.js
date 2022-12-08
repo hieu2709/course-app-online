@@ -9,7 +9,8 @@ import useTheme from '~/hooks/useTheme';
 import Icon from '../Icon';
 function MyDateTimePicker({ style, value, onChange }, ref) {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const theme = useTheme();
+  const [date, setDate] = useState(value);
+  const { theme } = useTheme();
   // console.log('date', value);
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -20,6 +21,7 @@ function MyDateTimePicker({ style, value, onChange }, ref) {
   };
   const handleConfirm = date => {
     onChange(date);
+    setDate(date);
     hideDatePicker();
   };
 
@@ -32,7 +34,7 @@ function MyDateTimePicker({ style, value, onChange }, ref) {
         ]}>
         <Text
           style={tw`text-[16px] leading-[20px] font-qs-semibold text-${theme.text}`}>
-          {dayjs(value || new Date())?.format('DD/MM/YYYY')}
+          {dayjs(date || new Date())?.format('DD/MM/YYYY')}
         </Text>
         <Icon
           type="AntDesign"

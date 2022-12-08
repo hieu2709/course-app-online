@@ -9,7 +9,7 @@ import Header from '~/layouts/Header';
 import TabBarCourse from '~/components/Course/TabBarCourse';
 
 function BookMark() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <Container>
       <View style={tw`flex-row justify-between items-center mx-5 mb-3 mt-5`}>

@@ -6,7 +6,7 @@ import Container from '~/layouts/Container';
 import Header from '~/layouts/Header';
 
 function TopMentors() {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (
     <Container>
       <Header

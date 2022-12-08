@@ -19,7 +19,7 @@ const mentor = {
 };
 
 function About({ onScroll }) {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const navigation = useNavigation();
   const goToDetailMentor = item => {
     navigation.navigate('DetailMentor', {
