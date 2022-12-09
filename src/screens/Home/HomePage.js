@@ -16,6 +16,7 @@ import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
+import { formatNumber } from '~/utils';
 import MostPopularCourse from './layouts/MostPopularCourse';
 import TopMentor from './layouts/TopMentors';
 
@@ -33,12 +34,25 @@ function HomePage({ navigation }) {
                 style={tw`w-15 h-15 rounded-full`}
               />
               <View style={tw`ml-4`}>
-                <Text style={tw`font-qs-regular text-base text-gray`}>
-                  Hello
-                </Text>
-                <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-                  {user?.fullname}
-                </Text>
+                <View style={tw`flex-row`}>
+                  <Text style={tw`font-qs-regular text-lg text-gray mr-1`}>
+                    Hello
+                  </Text>
+                  <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
+                    {user?.fullname}
+                  </Text>
+                </View>
+                <View style={tw`flex-row items-center`}>
+                  <Icon
+                    name={'coins'}
+                    type="FontAwesome5"
+                    size={20}
+                    color={tw.color('yellow')}
+                  />
+                  <Text style={tw`font-qs-semibold text-lg text-yellow ml-2`}>
+                    {formatNumber(user?.coins)} đ
+                  </Text>
+                </View>
               </View>
             </View>
           </View>

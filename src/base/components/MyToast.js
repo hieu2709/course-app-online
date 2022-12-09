@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Animated, Text } from 'react-native';
 import tw from '~/libs/tailwind';
 
-function MyToast({}, ref) {
+function MyToast({ style }, ref) {
   const [visible, setVisible] = useState(false);
   const [textt, setText] = useState('');
   const [statuss, setStatus] = useState(true);
@@ -50,6 +50,7 @@ function MyToast({}, ref) {
           tw`px-10 h-12 bg-${
             statuss ? 'green' : 'red'
           }  z-1000 absolute justify-center items-center rounded-3xl top-5 right-5`,
+          style,
           {
             transform: [
               {

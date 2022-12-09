@@ -24,6 +24,11 @@ export const config = [
     component: require('~/screens/MyCourse/DetailMyCourse').default,
     options: {},
   },
+  {
+    name: 'EditProfile',
+    component: require('~/screens/Profile/EditProfile').default,
+    options: {},
+  },
 ];
 export const noLogin = [
   {

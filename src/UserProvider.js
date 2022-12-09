@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc } from 'firebase/firestore';
 import React from 'react';
 import { useEffect } from 'react';
 import { useState, createContext } from 'react';
+import { db } from './firebase/config';
 const UserContext = createContext();
 function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -10,7 +12,13 @@ function UserProvider({ children }) {
       const value = await AsyncStorage.getItem('user');
       if (value) {
         const JSONValue = JSON.parse(value);
-        setUser(JSONValue);
+        const docRef = doc(db, 'users', JSONValue?.username);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setUser(docSnap?.data());
+        } else {
+          setUser(false);
+        }
       } else {
         setUser(false);
       }

@@ -1,5 +1,13 @@
 import { useNavigation } from '@react-navigation/native';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import React from 'react';
 import { useState } from 'react';
 import { useCallback } from 'react';
@@ -10,6 +18,7 @@ import Icon from '~/base/Icon';
 import MyButton from '~/components/MyButton';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
+import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 import BottomModal from '~/modals/BottomModal';
 import { formatNumber } from '~/utils';
@@ -18,7 +27,9 @@ function ItemCourse({ item, canPress = true }) {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const modalRef = useRef();
+  const { user } = useUser();
   const [categoryName, setCategoryName] = useState('');
+  const [myCourse, setMyCourse] = useState(null);
   const getCategoryName = useCallback(async () => {
     const q = query(
       collection(db, 'category'),
@@ -30,12 +41,56 @@ function ItemCourse({ item, canPress = true }) {
   useEffect(() => {
     getCategoryName();
   }, [getCategoryName]);
-  const handleBookmark = () => {
-    if (item.isBookMark) {
-      modalRef?.current?.open();
+  const docRef = doc(
+    db,
+    'mycourse',
+    user?.userId?.toString() + item.courseID.toString(),
+  );
+  const getMyCourse = useCallback(async () => {
+    const docsnap = await getDoc(docRef);
+    if (docsnap.exists()) {
+      setMyCourse(docsnap.data());
+    }
+  }, [docRef]);
+  // getMyCourse();
+  useEffect(() => {
+    getMyCourse();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const handleBookmark = async () => {
+    const docsnap = await getDoc(docRef);
+    if (docsnap.exists()) {
+      if (docsnap.data().isBookmark) {
+        modalRef?.current?.open();
+      } else {
+        setDoc(docRef, { isBookmark: true }, { merge: true });
+        const params = {
+          ...myCourse,
+          isBookmark: true,
+        };
+        setMyCourse(params);
+      }
+    } else {
+      const params = {
+        userId: user.userId,
+        courseId: item.courseID,
+        isBookmark: true,
+        status: 0,
+      };
+      setDoc(docRef, params);
+      setMyCourse(params);
     }
   };
   const handleCloseModal = () => {
+    modalRef?.current?.close();
+  };
+  const handleRemoveBookmark = () => {
+    setDoc(docRef, { isBookmark: false }, { merge: true });
+    const params = {
+      ...myCourse,
+      isBookmark: false,
+    };
+    setMyCourse(params);
     modalRef?.current?.close();
   };
   const onPress = () => {
@@ -60,7 +115,7 @@ function ItemCourse({ item, canPress = true }) {
             </Text>
           </View>
           <TouchableOpacity disabled={!canPress} onPress={handleBookmark}>
-            {item.isBookMark ? (
+            {myCourse?.isBookmark ? (
               <Icon
                 type="Ionicons"
                 name="ios-bookmark"
@@ -128,7 +183,7 @@ function ItemCourse({ item, canPress = true }) {
               title={'Yes, Remove'}
               style={tw`flex-1 h-14 bg-blue ml-2`}
               titleColor={tw.color('white')}
-              onPress={handleCloseModal}
+              onPress={handleRemoveBookmark}
             />
           </View>
         </View>

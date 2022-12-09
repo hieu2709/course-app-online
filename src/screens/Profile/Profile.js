@@ -10,15 +10,15 @@ import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
 import RowSection from './components/RowSection';
 
-function Profile() {
+function Profile({ navigation }) {
   const { theme } = useTheme();
   const { user, setUser } = useUser();
-  const clearStorage = key => {
-    AsyncStorage.clear(key);
+  const clearStorage = async key => {
+    await AsyncStorage.removeItem(key);
   };
-  const logout = () => {
+  const logout = async () => {
+    await clearStorage('user');
     setUser(false);
-    // clearStorage('user');
   };
   return (
     <Container>
@@ -50,16 +50,14 @@ function Profile() {
           style={tw`w-22 h-22 rounded-full mt-5`}
         />
         <Text style={tw`font-qs-bold mt-3 text-xl text-${theme.text}`}>
-          Andrew Ainsley
+          {user?.fullname}
         </Text>
-        {false && (
-          <Text style={tw`text-${theme.text} font-qs-semibold mt-2`}>
-            andrew_ainsley@yourdomain.com
-          </Text>
-        )}
       </View>
       <View style={tw`pt-2.5`}>
         <RowSection
+          onPress={() => {
+            navigation.navigate('EditProfile');
+          }}
           icon={
             <Icon type="AntDesign" name="user" size={22} color={theme.text} />
           }

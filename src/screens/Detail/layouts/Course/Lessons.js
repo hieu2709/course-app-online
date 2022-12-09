@@ -17,6 +17,7 @@ import {
   limit,
   orderBy,
   query,
+  where,
 } from 'firebase/firestore';
 import { db } from '~/firebase/config';
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
@@ -24,11 +25,16 @@ import MyLoading from '~/base/components/MyLoading';
 import { useEffect } from 'react';
 import { useCallback } from 'react';
 
-function Lessons({ onScroll }) {
+function Lessons() {
   const { theme } = useTheme();
   const { course, countLesson } = useCourse();
   const lessonsRef = collection(db, 'lessons');
-  const ref = query(lessonsRef, orderBy('lessonId'), limit(5));
+  const ref = query(
+    lessonsRef,
+    where('courseId', '==', course.courseID),
+    orderBy('lessonId'),
+    limit(5),
+  );
   const { data, isLoading } = useFirestoreQuery(
     ['lesson-limit', course.courseID],
     ref,
@@ -36,7 +42,7 @@ function Lessons({ onScroll }) {
 
   const navigation = useNavigation();
   const goToAllLessons = () => {
-    navigation.navigate('AllLessons');
+    navigation.navigate('AllLessons', { course });
   };
   if (isLoading) {
     return <MyLoading text={'Loading'} />;

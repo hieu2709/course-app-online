@@ -10,20 +10,16 @@ import Icon from '~/base/Icon';
 import ButtonBack from '~/components/ButtonBack';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
-import { formatNumber } from '~/utils';
-import YoutubePlayer from 'react-native-youtube-iframe';
-import { useState } from 'react';
-import { useCallback } from 'react';
+import { convertMintoHrs, formatNumber } from '~/utils';
 import useCourse from '~/hooks/useCourse';
+import { getDoc } from 'firebase/firestore';
 
-const HEADER_MAX_HEIGHT = 180; // max header height
-const HEADER_MIN_HEIGHT = 0; // min header height
-const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT; // header scrolling value
-
-function Header({ handleBookmark, categoryName }) {
+function Header({ handleBookmark, categoryName, isBookmark }) {
   // console.log(scrollY);
   const { theme } = useTheme();
   const { course } = useCourse();
+  const { totalTime } = useCourse();
+
   return (
     <View>
       <View style={tw`flex-row justify-between items-start mx-5 mt-5`}>
@@ -34,7 +30,7 @@ function Header({ handleBookmark, categoryName }) {
           </Text>
         </View>
         <TouchableOpacity style={tw`w-8`} onPress={handleBookmark}>
-          {course.isBookMark ? (
+          {isBookmark ? (
             <Icon
               type="Ionicons"
               name="ios-bookmark"
@@ -94,7 +90,7 @@ function Header({ handleBookmark, categoryName }) {
             color={tw.color('blue')}
           />
           <Text style={tw`font-qs-medium ml-1 text-${theme.text}`}>
-            {formatNumber(course.students)} Students
+            {formatNumber(course.students || 0)} Students
           </Text>
         </View>
         <View style={tw`flex-row items-center`}>
@@ -105,7 +101,7 @@ function Header({ handleBookmark, categoryName }) {
             color={tw.color('blue')}
           />
           <Text style={tw`font-qs-medium ml-1 text-${theme.text}`}>
-            2,5 Hours
+            {convertMintoHrs(totalTime || 0)}
           </Text>
         </View>
       </View>
