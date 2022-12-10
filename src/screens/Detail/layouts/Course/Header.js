@@ -77,7 +77,7 @@ function Header({ handleBookmark, categoryName, isBookmark }) {
           </View>
         ) : (
           <Text style={tw`font-qs-bold text-2xl text-blue`}>
-            ${course.price}
+            {formatNumber(course.price)} đ
           </Text>
         )}
       </View>

@@ -1,16 +1,11 @@
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-  where,
-} from 'firebase/firestore';
+  useFirestoreDocument,
+  useFirestoreDocumentMutation,
+} from '@react-query-firebase/firestore';
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import React from 'react';
 import { useState } from 'react';
-import { useCallback } from 'react';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
@@ -22,41 +17,41 @@ import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 import BottomModal from '~/modals/BottomModal';
 import { formatNumber } from '~/utils';
+import { useRefreshOnFocus } from '~/utils/hooks';
 
 function ItemCourse({ item, canPress = true }) {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const modalRef = useRef();
   const { user } = useUser();
-  const [categoryName, setCategoryName] = useState('');
-  const [myCourse, setMyCourse] = useState(null);
-  const getCategoryName = useCallback(async () => {
-    const q = query(
-      collection(db, 'category'),
-      where('categoryID', '==', item.categoryId),
-    );
-    const querySnap = await getDocs(q);
-    querySnap.forEach(d => setCategoryName(d.data().categoryName));
-  }, [item.categoryId]);
-  useEffect(() => {
-    getCategoryName();
-  }, [getCategoryName]);
+  const isFocused = useIsFocused();
+  const [isBookmark, setIsBookmark] = useState(false);
+  const categoryRef = doc(
+    collection(db, 'category'),
+    item?.categoryId?.toString(),
+  );
+  const { data: category } = useFirestoreDocument(
+    ['category', item?.categoryId],
+    categoryRef,
+  );
   const docRef = doc(
     db,
     'mycourse',
     user?.userId?.toString() + item.courseID.toString(),
   );
-  const getMyCourse = useCallback(async () => {
-    const docsnap = await getDoc(docRef);
-    if (docsnap.exists()) {
-      setMyCourse(docsnap.data());
-    }
-  }, [docRef]);
-  // getMyCourse();
+  const { data: myCourse, refetch } = useFirestoreDocument(
+    ['mycourse', user?.userId?.toString() + item.courseID.toString()],
+    docRef,
+  );
   useEffect(() => {
-    getMyCourse();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (myCourse?.exists()) {
+      setIsBookmark(myCourse?.data()?.isBookmark);
+    }
+  }, [myCourse]);
+  useEffect(() => {
+    console.log(1);
+  }, [isFocused]);
+  const mutationCourse = useFirestoreDocumentMutation(docRef, { merge: true });
   const handleBookmark = async () => {
     const docsnap = await getDoc(docRef);
     if (docsnap.exists()) {
@@ -64,11 +59,13 @@ function ItemCourse({ item, canPress = true }) {
         modalRef?.current?.open();
       } else {
         setDoc(docRef, { isBookmark: true }, { merge: true });
-        const params = {
-          ...myCourse,
-          isBookmark: true,
-        };
-        setMyCourse(params);
+        // const params = {
+        //   ...myCourse?.data(),
+        //   isBookmark: true,
+        // };
+        mutationCourse.mutate({ isBookmark: true });
+        setIsBookmark(true);
+        // setMyCourse(params);
       }
     } else {
       const params = {
@@ -78,7 +75,9 @@ function ItemCourse({ item, canPress = true }) {
         status: 0,
       };
       setDoc(docRef, params);
-      setMyCourse(params);
+      mutationCourse.mutate(params);
+      setIsBookmark(true);
+      // setMyCourse(params);
     }
   };
   const handleCloseModal = () => {
@@ -86,21 +85,24 @@ function ItemCourse({ item, canPress = true }) {
   };
   const handleRemoveBookmark = () => {
     setDoc(docRef, { isBookmark: false }, { merge: true });
-    const params = {
-      ...myCourse,
-      isBookmark: false,
-    };
-    setMyCourse(params);
+    // const params = {
+    //   ...myCourse,
+    //   isBookmark: false,
+    // };
+    mutationCourse.mutate({ isBookmark: false });
+    setIsBookmark(false);
+    // setMyCourse(params);
     modalRef?.current?.close();
   };
   const onPress = () => {
     if (canPress) {
       navigation.navigate('DetailCourse', {
         data: item,
-        categoryName,
+        categoryName: category?.data()?.categoryName,
       });
     }
   };
+
   return (
     <TouchableOpacity
       disabled={!canPress}
@@ -111,11 +113,11 @@ function ItemCourse({ item, canPress = true }) {
         <View style={tw`flex-row  justify-between items-center`}>
           <View style={tw`bg-blueOpacity p-2 rounded-lg`}>
             <Text style={tw`font-qs-semibold text-xs text-blue`}>
-              {categoryName}
+              {category?.data()?.categoryName}
             </Text>
           </View>
           <TouchableOpacity disabled={!canPress} onPress={handleBookmark}>
-            {myCourse?.isBookmark ? (
+            {isBookmark ? (
               <Icon
                 type="Ionicons"
                 name="ios-bookmark"
@@ -145,11 +147,13 @@ function ItemCourse({ item, canPress = true }) {
             </Text>
             <Text
               style={tw`font-qs-regular text-sm text-${theme.text} line-through`}>
-              ${item.price}
+              ${formatNumber(item.price)}
             </Text>
           </View>
         ) : (
-          <Text style={tw`font-qs-bold text-xl text-blue`}>${item.price}</Text>
+          <Text style={tw`font-qs-bold text-xl text-blue`}>
+            {formatNumber(item.price)} đ
+          </Text>
         )}
         <View style={tw`flex-row items-center mt-1`}>
           <Icon

@@ -12,8 +12,6 @@ import { formatNumber } from '~/utils';
 import ItemCourse from './ItemCourse';
 
 function SceneCourse({ categoryId }) {
-  const { theme } = useTheme();
-
   const courseRef = collection(db, 'courses');
   const ref = categoryId
     ? query(courseRef, where('categoryId', '==', categoryId), limit(4))

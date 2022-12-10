@@ -5,8 +5,7 @@ import tw from '~/libs/tailwind';
 import ButtonBack from '~/components/ButtonBack';
 import Icon from '~/base/Icon';
 import useTheme from '~/hooks/useTheme';
-import Header from '~/layouts/Header';
-import TabBarCourse from '~/components/Course/TabBarCourse';
+import ListCourseBookmark from './layouts/ListCourseBookmark';
 
 function BookMark() {
   const { theme } = useTheme();
@@ -31,8 +30,7 @@ function BookMark() {
           />
         </TouchableOpacity>
       </View>
-
-      <TabBarCourse scrollEnabled={true} />
+      <ListCourseBookmark />
     </Container>
   );
 }

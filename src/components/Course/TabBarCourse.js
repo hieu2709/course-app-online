@@ -5,7 +5,7 @@ import { Text, useWindowDimensions, View } from 'react-native';
 import tw from '~/libs/tailwind';
 import SceneCourse from './SceneCourse';
 
-function TabBarCourse({ scrollEnabled }) {
+function TabBarCourse() {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
   // const renderScene = SceneMap({
