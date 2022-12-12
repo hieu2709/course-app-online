@@ -27,7 +27,7 @@ function SceneCourse({ categoryId }) {
     return (
       <ScrollView style={tw`flex-1`}>
         {data?.docs?.map((item, i) => (
-          <ItemCourse key={i} item={item?.data()} />
+          <ItemCourse key={i} courseId={item?.data()?.courseID} />
         ))}
       </ScrollView>
     );

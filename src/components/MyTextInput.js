@@ -98,6 +98,7 @@ function MyTextInput(
         autoCapitalize={capitalize}
         secureTextEntry={isPassword && isHide}
         keyboardType={type}
+        selectTextOnFocus={true}
         placeholder={placeholder}
         placeholderTextColor={tw.color('gray')}
         style={[

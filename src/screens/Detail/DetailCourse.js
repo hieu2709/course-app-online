@@ -12,7 +12,6 @@ import MyTabBar from './layouts/Course/MyTabBar';
 import Header from './layouts/Course/Header';
 import ButtonEnrolCourse from '~/components/ButtonEnrollCourse';
 import { CourseProvider } from '~/provider/CourseProvider';
-import { useCallback } from 'react';
 import {
   collection,
   doc,
@@ -27,67 +26,65 @@ import { useEffect } from 'react';
 import { db } from '~/firebase/config';
 import { useState } from 'react';
 import useUser from '~/hooks/useUser';
+import {
+  useFirestoreDocument,
+  useFirestoreDocumentMutation,
+} from '@react-query-firebase/firestore';
+import { formatNumber } from '~/utils';
+import MyToast from '~/base/components/MyToast';
 
 function DetailCourse({ navigation, route }) {
-  const { data, categoryName } = route.params;
+  const { data } = route.params;
   const [countLesson, setCountLesson] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
-  // const [isBookmark, setIsBookmark] = useState(false);
-  const [myCourse, setMyCourse] = useState(null);
   const { theme } = useTheme();
-  const { user } = useUser();
-  // console.log(user);
-  const modalRef = useRef();
-  const lessonsRef = collection(db, 'lessons');
-  const getCountLesson = useCallback(async () => {
-    const snapshot = await getCountFromServer(lessonsRef);
-    setCountLesson(snapshot.data().count);
-  }, [lessonsRef]);
 
-  const getTotalTime = useCallback(async () => {
-    const q = query(lessonsRef, where('courseId', '==', data.courseID));
-    const snapshot = await getDocs(q);
-    let times = 0;
-    snapshot.forEach(d => (times += d.data().time));
-    setTotalTime(times);
-    return times;
-  }, [data.courseID, lessonsRef]);
+  const { user, setUser } = useUser();
+  const modalRef = useRef();
+  const notEnoughMoneyRef = useRef();
+  const enrollCourseRef = useRef();
+  const lessonsRef = collection(db, 'lessons');
+  const toastRef = useRef();
   // getTotalTime();
   useEffect(() => {
+    const getCountLesson = async () => {
+      const snapshot = await getCountFromServer(lessonsRef);
+      setCountLesson(snapshot.data().count);
+    };
     getCountLesson();
-  }, [getCountLesson]);
+  }, [lessonsRef]);
   useEffect(() => {
+    const getTotalTime = async () => {
+      const q = query(lessonsRef, where('courseId', '==', data.courseID));
+      const snapshot = await getDocs(q);
+      let times = 0;
+      snapshot.forEach(d => (times += d.data().time));
+      setTotalTime(times);
+      return times;
+    };
     getTotalTime();
-  }, [getTotalTime]);
-  // console.log('1');
+  }, [data.courseID, lessonsRef]);
   const docRef = doc(
     db,
     'mycourse',
     user?.userId?.toString() + data.courseID.toString(),
   );
-  const getMyCourse = useCallback(async () => {
-    const docsnap = await getDoc(docRef);
-    if (docsnap.exists()) {
-      setMyCourse(docsnap.data());
-    }
-  }, [docRef]);
-  // getMyCourse();
-  useEffect(() => {
-    getMyCourse();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { data: myCourse, refetch } = useFirestoreDocument(
+    ['mycourse', user?.userId?.toString() + data.courseID.toString()],
+    docRef,
+  );
+  const mutationCourse = useFirestoreDocumentMutation(
+    docRef,
+    { merge: true },
+    { onSettled: refetch },
+  );
   const handleBookmark = async () => {
     const docsnap = await getDoc(docRef);
     if (docsnap.exists()) {
       if (docsnap.data().isBookmark) {
         modalRef?.current?.open();
       } else {
-        setDoc(docRef, { isBookmark: true }, { merge: true });
-        const params = {
-          ...myCourse,
-          isBookmark: true,
-        };
-        setMyCourse(params);
+        mutationCourse.mutate({ isBookmark: true });
       }
     } else {
       const params = {
@@ -96,21 +93,60 @@ function DetailCourse({ navigation, route }) {
         isBookmark: true,
         status: 0,
       };
-      setDoc(docRef, params);
-      setMyCourse(params);
+      mutationCourse.mutate(params);
     }
   };
-  const handleCloseModal = () => {
-    modalRef?.current?.close();
+  const handleCloseModal = ref => {
+    ref?.current?.close();
   };
   const handleRemoveBookmark = () => {
-    setDoc(docRef, { isBookmark: false }, { merge: true });
-    const params = {
-      ...myCourse,
-      isBookmark: false,
-    };
-    setMyCourse(params);
+    mutationCourse.mutate({ isBookmark: false });
     modalRef?.current?.close();
+  };
+  const handleCheckCoins = () => {
+    const coins = user?.coins;
+    if (coins >= data?.price) {
+      enrollCourseRef?.current?.open();
+    } else {
+      notEnoughMoneyRef?.current?.open();
+    }
+  };
+  const goToTransaction = () => {
+    notEnoughMoneyRef?.current?.close();
+    navigation.navigate('Transaction');
+  };
+  const setCoinsUser = () => {
+    try {
+      const newMycoins = user?.coins - data?.price;
+      const userParam = {
+        ...user,
+        coins: newMycoins,
+      };
+      setUser(userParam);
+      const userRef = doc(db, 'users', user?.username);
+      setDoc(userRef, { coins: newMycoins }, { merge: true });
+      toastRef?.current?.open(true, 'Bạn đã tham gia khóa học thành công!');
+    } catch (e) {
+      console.log('error enroll course(exist): ', e);
+      toastRef?.current?.open(true, 'Tham gia khóa học thất bại!');
+    }
+    enrollCourseRef?.current?.close();
+  };
+  const handleEnrollCourse = async () => {
+    const docsnap = await getDoc(docRef);
+    if (docsnap.exists()) {
+      mutationCourse.mutate({ status: 1 });
+      setCoinsUser();
+    } else {
+      const params = {
+        userId: user.userId,
+        courseId: data.courseID,
+        isBookmark: false,
+        status: 1,
+      };
+      mutationCourse.mutate(params);
+      setCoinsUser();
+    }
   };
   return (
     <Container>
@@ -121,16 +157,18 @@ function DetailCourse({ navigation, route }) {
         <View style={tw`flex-1`}>
           <View style={tw`flex-1`}>
             <View style={[tw`flex-1`]}>
+              <MyToast ref={toastRef} />
               <Header
-                categoryName={categoryName}
                 handleBookmark={handleBookmark}
-                isBookmark={myCourse?.isBookmark || false}
+                isBookmark={myCourse?.data()?.isBookmark || false}
               />
               <View style={tw`flex-1`}>
                 <MyTabBar />
               </View>
             </View>
-            <ButtonEnrolCourse />
+            {myCourse?.data()?.status === 0 && (
+              <ButtonEnrolCourse onPress={handleCheckCoins} />
+            )}
           </View>
 
           <BottomModal ref={modalRef}>
@@ -138,23 +176,95 @@ function DetailCourse({ navigation, route }) {
               <View
                 style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
                 <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-                  Remove from Bookmark?
+                  Bỏ đánh dấu khóa học này?
                 </Text>
               </View>
-              <ItemCourse item={data} canPress={false} />
+              <ItemCourse courseId={data?.courseID} canPress={false} />
               <View
                 style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
                 <MyButton
-                  title={'Cancel'}
-                  style={tw`flex-1 h-14 bg-blueSoft mr-2`}
+                  title={'Hủy'}
+                  style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
                   titleColor={tw.color('blue')}
-                  onPress={handleCloseModal}
+                  onPress={() => handleCloseModal(modalRef)}
                 />
                 <MyButton
-                  title={'Yes, Remove'}
+                  title={'Bỏ đánh dấu'}
                   style={tw`flex-1 h-14 bg-blue ml-2`}
                   titleColor={tw.color('white')}
                   onPress={handleRemoveBookmark}
+                />
+              </View>
+            </View>
+          </BottomModal>
+          <BottomModal ref={notEnoughMoneyRef}>
+            <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
+              <View
+                style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
+                <View>
+                  <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
+                    Bạn không đủ tiền để mua khóa học này!
+                  </Text>
+                </View>
+                <View style={tw`flex-row items-center justify-center w-[96%]`}>
+                  <Text style={tw`font-qs-regular text-sm text-${theme.text}`}>
+                    Số tiền hiện tại: {formatNumber(user?.coins)} đ
+                  </Text>
+                  {/* <Text style={tw`font-qs-regular text-xs text-${theme.text}`}>
+                    Course price: {formatNumber(data?.price)} đ
+                  </Text> */}
+                </View>
+              </View>
+              <ItemCourse courseId={data?.courseID} canPress={false} />
+              <View
+                style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
+                <MyButton
+                  title={'Hủy'}
+                  style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
+                  titleColor={tw.color('blue')}
+                  onPress={() => handleCloseModal(notEnoughMoneyRef)}
+                />
+                <MyButton
+                  title={'Tới nạp tiền'}
+                  style={tw`flex-1 h-14 bg-blue ml-2`}
+                  titleColor={tw.color('white')}
+                  onPress={goToTransaction}
+                />
+              </View>
+            </View>
+          </BottomModal>
+          <BottomModal ref={enrollCourseRef}>
+            <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
+              <View
+                style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
+                <View>
+                  <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
+                    Bạn chắc chắn muốn mua khóa học này?
+                  </Text>
+                </View>
+                <View style={tw`flex-row items-center justify-center w-[96%]`}>
+                  <Text style={tw`font-qs-regular text-sm text-${theme.text}`}>
+                    Số tiền hiện tại: {formatNumber(user?.coins)} đ
+                  </Text>
+                  {/* <Text style={tw`font-qs-regular text-xs text-${theme.text}`}>
+                    Course price: {formatNumber(data?.price)} đ
+                  </Text> */}
+                </View>
+              </View>
+              <ItemCourse courseId={data?.courseID} canPress={false} />
+              <View
+                style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
+                <MyButton
+                  title={'Hủy'}
+                  style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
+                  titleColor={tw.color('blue')}
+                  onPress={() => handleCloseModal(notEnoughMoneyRef)}
+                />
+                <MyButton
+                  title={'Đồng ý'}
+                  style={tw`flex-1 h-14 bg-blue ml-2`}
+                  titleColor={tw.color('white')}
+                  onPress={handleEnrollCourse}
                 />
               </View>
             </View>

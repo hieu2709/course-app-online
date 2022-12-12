@@ -12,10 +12,9 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import { convertMintoHrs, formatNumber } from '~/utils';
 import useCourse from '~/hooks/useCourse';
-import { getDoc } from 'firebase/firestore';
+import CategoryCourse from '~/components/Course/CategoryCourse';
 
-function Header({ handleBookmark, categoryName, isBookmark }) {
-  // console.log(scrollY);
+function Header({ handleBookmark, isBookmark }) {
   const { theme } = useTheme();
   const { course } = useCourse();
   const { totalTime } = useCourse();
@@ -26,7 +25,7 @@ function Header({ handleBookmark, categoryName, isBookmark }) {
         <View style={tw`flex-row items-start flex-1`}>
           <ButtonBack iconColor={tw.color('blue')} iconSize={30} />
           <Text style={tw`text-${theme.text} flex-1 font-qs-bold text-2xl`}>
-            {course.courseName}
+            {course?.courseName}
           </Text>
         </View>
         <TouchableOpacity style={tw`w-8`} onPress={handleBookmark}>
@@ -48,11 +47,7 @@ function Header({ handleBookmark, categoryName, isBookmark }) {
         </TouchableOpacity>
       </View>
       <View style={tw`flex-row mx-5 my-3`}>
-        <View style={tw`bg-blueOpacity p-2 rounded-lg`}>
-          <Text style={tw`font-qs-semibold text-xs text-blue`}>
-            {categoryName}
-          </Text>
-        </View>
+        <CategoryCourse categoryId={course?.categoryId} />
         <View style={tw`flex-row items-center ml-5`}>
           <Icon
             type="AntDesign"

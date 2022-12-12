@@ -29,6 +29,11 @@ export const config = [
     component: require('~/screens/Profile/EditProfile').default,
     options: {},
   },
+  {
+    name: 'Transaction',
+    component: require('~/screens/Transaction/Transaction').default,
+    options: {},
+  },
 ];
 export const noLogin = [
   {

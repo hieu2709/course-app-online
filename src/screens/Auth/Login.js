@@ -33,7 +33,6 @@ function Login({ navigation }) {
   const { setUser } = useUser();
   const toastRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
-  const inset = useSafeAreaInsets();
   const [isRemember, setIsRemember] = useState(false);
   const checkBoxRef = useRef();
   const setUserStorage = async user => {
