@@ -1,25 +1,20 @@
 import React from 'react';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { Text } from 'react-native';
+import { TabView, TabBar } from 'react-native-tab-view';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import About from './About';
 import Lessons from './Lessons';
 import Reviews from './Reviews';
-// const renderScene = SceneMap({
-//   about: About,
-//   lessons: Lessons,
-//   reviews: Reviews,
-// });
 
-function MyTabBar({ onScroll }) {
+function MyTabBar() {
   const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'about', title: 'About' },
-    { key: 'lessons', title: 'Lessons' },
-    { key: 'reviews', title: 'Reviews' },
+    { key: 'about', title: 'Thông tin' },
+    { key: 'lessons', title: 'Bài học' },
+    { key: 'reviews', title: 'Đánh giá' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {

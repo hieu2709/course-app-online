@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Animated,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
 import ButtonBack from '~/components/ButtonBack';
 import useTheme from '~/hooks/useTheme';
@@ -56,7 +50,7 @@ function Header({ handleBookmark, isBookmark }) {
             color={tw.color('yellow')}
           />
           <Text style={tw`font-qs-medium ml-2 text-${theme.text}`}>
-            {course.rate} ({formatNumber(4390)} reviews)
+            {course.rate} ({formatNumber(4390)} đánh giá)
           </Text>
         </View>
       </View>
@@ -85,7 +79,7 @@ function Header({ handleBookmark, isBookmark }) {
             color={tw.color('blue')}
           />
           <Text style={tw`font-qs-medium ml-1 text-${theme.text}`}>
-            {formatNumber(course.students || 0)} Students
+            {formatNumber(course.students || 0)} Học sinh
           </Text>
         </View>
         <View style={tw`flex-row items-center`}>

@@ -2,95 +2,19 @@ import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { collection, orderBy, query, where } from 'firebase/firestore';
 import React from 'react';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
-import MyLoading from '~/base/components/MyLoading';
+import MyLoadingFull from '~/base/components/MyLoadingFull';
 import Icon from '~/base/Icon';
 import ButtonEnrolCourse from '~/components/ButtonEnrollCourse';
 import ItemLesson from '~/components/Lessons/ItemLesson';
 import { db } from '~/firebase/config';
-import useCourse from '~/hooks/useCourse';
 import useTheme from '~/hooks/useTheme';
 import Container from '~/layouts/Container';
 import Header from '~/layouts/Header';
 import tw from '~/libs/tailwind';
-
-const listLessons = [
-  {
-    id: 1,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 2,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 3,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 4,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 5,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 6,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 7,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 8,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 9,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 10,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 11,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-  {
-    id: 12,
-    name: 'Why Using Figma',
-    video: '',
-    time: '10 mins',
-  },
-];
 function AllLesson({ navigation, route }) {
   const { theme } = useTheme();
   const { course } = route.params || '';
-  const title = course?.courseName || 'Lessons';
+  const title = course?.courseName || 'Các bài học';
   const lessonsRef = collection(db, 'lessons');
   const ref = query(
     lessonsRef,
@@ -102,7 +26,7 @@ function AllLesson({ navigation, route }) {
     ref,
   );
   if (isLoading) {
-    return <MyLoading text={'Loading'} />;
+    return <MyLoadingFull text={'Đang tải dữ liệu...'} />;
   } else {
     return (
       <Container>

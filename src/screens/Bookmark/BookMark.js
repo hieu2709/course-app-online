@@ -1,8 +1,7 @@
 import React from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
-import ButtonBack from '~/components/ButtonBack';
 import Icon from '~/base/Icon';
 import useTheme from '~/hooks/useTheme';
 import ListCourseBookmark from './layouts/ListCourseBookmark';
@@ -18,7 +17,7 @@ function BookMark() {
             <Image style={tw`w-4 h-4`} source={require('~/assets/logo.png')} />
           </View>
           <Text style={tw`ml-3 font-qs-bold text-xl text-${theme.text}`}>
-            Bookmark
+            Khóa học đã đánh dấu
           </Text>
         </View>
         <TouchableOpacity>

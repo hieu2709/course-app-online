@@ -1,7 +1,6 @@
 import React from 'react';
 import { forwardRef } from 'react';
 import { Text, View } from 'react-native';
-import MyLoadingFull from '~/base/components/MyLoadingFull';
 import LoadingIcon from '~/base/LoadingIcon';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';

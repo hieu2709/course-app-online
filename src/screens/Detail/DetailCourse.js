@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useRef } from 'react';
-import { Animated, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import MyButton from '~/components/MyButton';
 import useTheme from '~/hooks/useTheme';
 import Container from '~/layouts/Container';
@@ -38,14 +38,12 @@ function DetailCourse({ navigation, route }) {
   const [countLesson, setCountLesson] = useState(0);
   const [totalTime, setTotalTime] = useState(0);
   const { theme } = useTheme();
-
   const { user, setUser } = useUser();
   const modalRef = useRef();
   const notEnoughMoneyRef = useRef();
   const enrollCourseRef = useRef();
   const lessonsRef = collection(db, 'lessons');
   const toastRef = useRef();
-  // getTotalTime();
   useEffect(() => {
     const getCountLesson = async () => {
       const snapshot = await getCountFromServer(lessonsRef);
@@ -84,7 +82,11 @@ function DetailCourse({ navigation, route }) {
       if (docsnap.data().isBookmark) {
         modalRef?.current?.open();
       } else {
-        mutationCourse.mutate({ isBookmark: true });
+        const param = {
+          ...myCourse?.data(),
+          isBookmark: true,
+        };
+        mutationCourse.mutate(param);
       }
     } else {
       const params = {
@@ -100,7 +102,11 @@ function DetailCourse({ navigation, route }) {
     ref?.current?.close();
   };
   const handleRemoveBookmark = () => {
-    mutationCourse.mutate({ isBookmark: false });
+    const param = {
+      ...myCourse?.data(),
+      isBookmark: false,
+    };
+    mutationCourse.mutate(param);
     modalRef?.current?.close();
   };
   const handleCheckCoins = () => {
@@ -123,7 +129,7 @@ function DetailCourse({ navigation, route }) {
         coins: newMycoins,
       };
       setUser(userParam);
-      const userRef = doc(db, 'users', user?.username);
+      const userRef = doc(db, 'users', user?.userId?.toString());
       setDoc(userRef, { coins: newMycoins }, { merge: true });
       toastRef?.current?.open(true, 'Bạn đã tham gia khóa học thành công!');
     } catch (e) {
@@ -135,7 +141,11 @@ function DetailCourse({ navigation, route }) {
   const handleEnrollCourse = async () => {
     const docsnap = await getDoc(docRef);
     if (docsnap.exists()) {
-      mutationCourse.mutate({ status: 1 });
+      const param = {
+        ...myCourse?.data(),
+        status: 1,
+      };
+      mutationCourse.mutate(param);
       setCoinsUser();
     } else {
       const params = {
@@ -147,7 +157,14 @@ function DetailCourse({ navigation, route }) {
       mutationCourse.mutate(params);
       setCoinsUser();
     }
+    const userId = user?.userId;
+    const mentorId = data?.mentorID;
+    await setDoc(doc(db, 'class', userId?.toString() + mentorId?.toString()), {
+      userId,
+      mentorID: mentorId,
+    });
   };
+
   return (
     <Container>
       <CourseProvider

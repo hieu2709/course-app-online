@@ -1,9 +1,9 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import Icon from '~/base/Icon';
 import tw from '~/libs/tailwind';
 
-function MyCheckBox(props, ref) {
+function MyCheckBox({}, ref) {
   const [isCheck, setIsCheck] = useState(false);
   useImperativeHandle(ref, () => ({
     onPress: () => setIsCheck(!isCheck),

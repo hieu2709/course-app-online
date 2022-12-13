@@ -1,17 +1,15 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 // import RNDateTimePicker from '@react-native-community/datetimepicker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import dayjs from 'dayjs';
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import tw from '~/libs/tailwind';
-import BottomModal from '../../modals/BottomModal';
 import useTheme from '~/hooks/useTheme';
 import Icon from '../Icon';
 function MyDateTimePicker({ style, value, onChange }, ref) {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [date, setDate] = useState(value);
   const { theme } = useTheme();
-  // console.log('date', value);
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -50,6 +48,7 @@ function MyDateTimePicker({ style, value, onChange }, ref) {
           mode="date"
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
+          date={date}
           // isDarkModeEnabled={false}
         />
       </View>

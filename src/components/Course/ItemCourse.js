@@ -3,7 +3,7 @@ import {
   useFirestoreDocument,
   useFirestoreDocumentMutation,
 } from '@react-query-firebase/firestore';
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import React from 'react';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
@@ -50,7 +50,11 @@ function ItemCourse({ courseId, canPress = true }) {
       if (docsnap.data().isBookmark) {
         modalRef?.current?.open();
       } else {
-        mutationCourse.mutate({ isBookmark: true });
+        const param = {
+          ...myCourse?.data(),
+          isBookmark: true,
+        };
+        mutationCourse.mutate(param);
       }
     } else {
       const params = {
@@ -66,7 +70,11 @@ function ItemCourse({ courseId, canPress = true }) {
     modalRef?.current?.close();
   };
   const handleRemoveBookmark = () => {
-    mutationCourse.mutate({ isBookmark: false });
+    const param = {
+      ...myCourse?.data(),
+      isBookmark: false,
+    };
+    mutationCourse.mutate(param);
     modalRef?.current?.close();
   };
   const onPress = () => {
@@ -139,7 +147,7 @@ function ItemCourse({ courseId, canPress = true }) {
             />
             <Text style={tw`font-qs-medium ml-2 text-${theme.text}`}>
               {course?.data()?.rate} | {formatNumber(course?.data()?.students)}{' '}
-              students
+              học sinh
             </Text>
           </View>
         </View>
@@ -148,20 +156,20 @@ function ItemCourse({ courseId, canPress = true }) {
             <View
               style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
               <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-                Remove from Bookmark?
+                Bỏ đánh dấu khóa học này?
               </Text>
             </View>
             <ItemCourse courseId={courseId} canPress={false} />
             <View
               style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
               <MyButton
-                title={'Cancel'}
+                title={'Hủy'}
                 style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
                 titleColor={tw.color('blue')}
                 onPress={handleCloseModal}
               />
               <MyButton
-                title={'Yes, Remove'}
+                title={'Bỏ đánh dấu'}
                 style={tw`flex-1 h-14 bg-blue ml-2`}
                 titleColor={tw.color('white')}
                 onPress={handleRemoveBookmark}

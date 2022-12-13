@@ -1,29 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import {
-  Animated,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import ItemLesson from '~/components/Lessons/ItemLesson';
 import useCourse from '~/hooks/useCourse';
-import {
-  collection,
-  getCountFromServer,
-  limit,
-  orderBy,
-  query,
-  where,
-} from 'firebase/firestore';
+import { collection, limit, orderBy, query, where } from 'firebase/firestore';
 import { db } from '~/firebase/config';
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import MyLoading from '~/base/components/MyLoading';
-import { useEffect } from 'react';
-import { useCallback } from 'react';
 
 function Lessons() {
   const { theme } = useTheme();
@@ -45,17 +30,17 @@ function Lessons() {
     navigation.navigate('AllLessons', { course });
   };
   if (isLoading) {
-    return <MyLoading text={'Loading'} />;
+    return <MyLoading text={'Đang tải dữ liệu...'} />;
   } else {
     return (
       <View style={tw`flex-1`}>
         <View
           style={tw`flex-row justify-between items-center mt-5 mx-5 pb-2.5`}>
           <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-            {countLesson} Lessons
+            {countLesson} Bài học
           </Text>
           <TouchableOpacity onPress={goToAllLessons}>
-            <Text style={tw`font-qs-bold text-base text-blue`}>See All</Text>
+            <Text style={tw`font-qs-bold text-base text-blue`}>Tất cả</Text>
           </TouchableOpacity>
         </View>
         <ScrollView

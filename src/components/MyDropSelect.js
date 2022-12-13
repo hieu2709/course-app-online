@@ -1,20 +1,13 @@
 import React from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
-import {
-  Animated,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Animated, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 
 function MyDropSelect({ value, onChange, list, selectStyle, dropStyle }) {
   const [isDrop, setIsDrop] = useState(false);
-  // const animScaleY = useRef(new Animated.Value(0)).current;
   const animRotate = useRef(new Animated.Value(0)).current;
   const animOpacity = useRef(new Animated.Value(0)).current;
   const animTranslateY = useRef(new Animated.Value(0)).current;
@@ -79,7 +72,7 @@ function MyDropSelect({ value, onChange, list, selectStyle, dropStyle }) {
         ) : (
           <Text
             style={tw`text-gray text-[16px] leading-[20px] font-qs-semibold `}>
-            Select gender
+            Chọn giới tính
           </Text>
         )}
         <Animated.View

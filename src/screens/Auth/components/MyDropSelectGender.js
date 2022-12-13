@@ -6,11 +6,11 @@ import tw from '~/libs/tailwind';
 const listGender = [
   {
     key: 1,
-    name: 'Male',
+    name: 'Nam',
   },
   {
     key: 2,
-    name: 'Female',
+    name: 'Nữ',
   },
 ];
 function MyDropSelectGender({ value, onChange }) {

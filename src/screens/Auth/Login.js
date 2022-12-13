@@ -10,18 +10,15 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ButtonBack from '~/components/ButtonBack';
+
 import MyButton from '~/components/MyButton';
 import MyCheckBox from '~/components/MyCheckBox';
 import MyTextInput from '~/components/MyTextInput';
 import tw from '~/libs/tailwind';
-import { useDispatch } from 'react-redux';
-import { userLogin } from '~/redux/userReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useTheme from '~/hooks/useTheme';
-import Icon from '~/base/Icon';
 import Container from '~/layouts/Container';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '~/firebase/config';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 import MyToast from '~/base/components/MyToast';
@@ -29,16 +26,14 @@ import useUser from '~/hooks/useUser';
 
 function Login({ navigation }) {
   const { theme } = useTheme();
-  // console.log('theme', theme);
   const { setUser } = useUser();
   const toastRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
   const checkBoxRef = useRef();
-  const setUserStorage = async user => {
+  const setUserStorage = async userId => {
     try {
-      const jsonValue = JSON.stringify(user);
-      await AsyncStorage.setItem('user', jsonValue);
+      await AsyncStorage.setItem('user', userId.toString());
     } catch (e) {
       console.log('error setItem:', e);
     }
@@ -56,21 +51,25 @@ function Login({ navigation }) {
   const onSubmit = async data => {
     setIsLoading(true);
     const username = data?.username;
-    // console.log(username);
-    const docRef = doc(db, 'users', username);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      if (docSnap.data()?.password == data.password) {
-        setUser(docSnap.data());
+    const docRef = query(
+      collection(db, 'users'),
+      where('username', '==', username),
+    );
+    const docSnap = await getDocs(docRef);
+
+    if (!docSnap.empty) {
+      const d = docSnap.docs[0];
+      if (d.data()?.password === data.password) {
+        setUser(d.data());
         if (isRemember) {
-          setUserStorage(docSnap.data());
+          setUserStorage(d.data().userId);
         }
       } else {
-        toastRef?.current?.open(false, 'Password is not correct!');
+        toastRef?.current?.open(false, 'Mật khẩu không chính xác!');
       }
       // console.log(docSnap.data().password);
     } else {
-      toastRef?.current?.open(false, 'Username is not exist!');
+      toastRef?.current?.open(false, 'Tên tài khoản không tồn tại!');
     }
     setIsLoading(false);
   };
@@ -86,7 +85,7 @@ function Login({ navigation }) {
             {/* <ButtonBack style={tw`mt-5`} /> */}
             <MyToast ref={toastRef} />
             <Text style={tw`font-qs-bold text-4xl text-${theme.text}`}>
-              Login to your Account
+              Đăng nhập với tài khoản
             </Text>
             <View style={tw`mt-8`}>
               <Controller
@@ -97,12 +96,12 @@ function Login({ navigation }) {
                 }}
                 render={({ field: { onChange, value } }) => (
                   <MyTextInput
-                    placeholder={'Username'}
+                    placeholder={'Tên tài khoản'}
                     onChangeText={onChange}
                     value={value}
                     leftIcon={{
-                      type: 'MaterialIcons',
-                      name: 'email',
+                      type: 'FontAwesome',
+                      name: 'user',
                       size: 20,
                     }}
                   />
@@ -117,7 +116,7 @@ function Login({ navigation }) {
                 render={({ field: { onChange, value } }) => (
                   <MyTextInput
                     isPassword={true}
-                    placeholder={'Password'}
+                    placeholder={'Mật khẩu'}
                     onChangeText={onChange}
                     value={value}
                     leftIcon={{ type: 'FontAwesome', name: 'lock', size: 20 }}
@@ -140,27 +139,27 @@ function Login({ navigation }) {
                   <MyCheckBox ref={checkBoxRef} />
                   <Text
                     style={tw`font-qs-semibold text-${theme.text} text-[16px] ml-3`}>
-                    Remember me
+                    Nhớ đăng nhập
                   </Text>
                 </TouchableOpacity>
               </View>
               <MyButton
                 style={tw`mt-10`}
-                title={'Sign in'}
+                title={'Đăng nhập'}
                 onPress={handleSubmit(onSubmit)}
               />
               <Text
                 style={tw`text-center mt-6 text-blue font-qs-bold text-base`}>
-                Forgot the password?
+                Quên mật khẩu?
               </Text>
               <View style={tw`flex-row justify-center items-center mt-10`}>
                 <Text style={tw`font-qs-medium text-sm text-${theme.text}`}>
-                  Don't have Account?
+                  Bạn chưa có tài khoản?
                 </Text>
                 <TouchableOpacity
                   onPress={() => navigation.navigate('Register')}>
                   <Text style={tw`font-qs-bold ml-1 text-base text-blue`}>
-                    Sign up
+                    Đăng ký
                   </Text>
                 </TouchableOpacity>
               </View>

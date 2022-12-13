@@ -10,40 +10,25 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ButtonBack from '~/components/ButtonBack';
 import MyButton from '~/components/MyButton';
 import MyCheckBox from '~/components/MyCheckBox';
 import MyTextInput from '~/components/MyTextInput';
 import tw from '~/libs/tailwind';
 import { useDispatch } from 'react-redux';
-import { userLogin } from '~/redux/userReducer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import useTheme from '~/hooks/useTheme';
-import Icon from '~/base/Icon';
 import Container from '~/layouts/Container';
-import ModalSlideFromRight from '~/modals/ModalSlideFromRight';
 import MyToast from '~/base/components/MyToast';
 import { db } from '~/firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 
 function Register({ navigation }) {
   const { theme } = useTheme();
-  // console.log('theme', theme);
   const [isLoading, setIsLoading] = useState(false);
-  const inset = useSafeAreaInsets();
   const toastRef = useRef();
   const [isRemember, setIsRemember] = useState(false);
   const checkBoxRef = useRef();
-  const dispatch = useDispatch();
-  const setUser = async user => {
-    try {
-      const jsonValue = JSON.stringify(user);
-      await AsyncStorage.setItem('user', jsonValue);
-    } catch (e) {
-      console.log('error setItem:', e);
-    }
-  };
   const {
     control,
     handleSubmit,
@@ -57,11 +42,13 @@ function Register({ navigation }) {
   const onSubmit = async data => {
     setIsLoading(true);
     const username = data?.username;
-    // console.log(username);
-    const docRef = doc(db, 'users', username);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      toastRef?.current?.open(false, 'Username is already exist!');
+    const docRef = query(
+      collection(db, 'users'),
+      where('username', '==', username),
+    );
+    const docSnap = await getDocs(docRef);
+    if (!docSnap.empty) {
+      toastRef?.current?.open(false, 'Tên tài khoản đã tồn tại!');
     } else {
       navigation.navigate('FillProfile', {
         username,
@@ -84,10 +71,10 @@ function Register({ navigation }) {
             <MyToast ref={toastRef} />
             {/* <ButtonBack style={tw`mt-5`} /> */}
             <Text style={tw`font-qs-bold text-4xl text-${theme.text}`}>
-              Create your
+              Tạo tài khoản
             </Text>
             <Text style={tw`font-qs-bold text-4xl text-${theme.text}`}>
-              Account
+              của bạn
             </Text>
             <View style={tw`mt-8`}>
               <Controller
@@ -98,12 +85,12 @@ function Register({ navigation }) {
                 }}
                 render={({ field: { onChange, value } }) => (
                   <MyTextInput
-                    placeholder={'Username'}
+                    placeholder={'Tên tài khoản'}
                     onChangeText={onChange}
                     value={value}
                     leftIcon={{
-                      type: 'MaterialIcons',
-                      name: 'email',
+                      type: 'FontAwesome',
+                      name: 'user',
                       size: 20,
                     }}
                   />
@@ -118,7 +105,7 @@ function Register({ navigation }) {
                 render={({ field: { onChange, value } }) => (
                   <MyTextInput
                     isPassword={true}
-                    placeholder={'Password'}
+                    placeholder={'Mật khẩu'}
                     onChangeText={onChange}
                     value={value}
                     leftIcon={{ type: 'FontAwesome', name: 'lock', size: 20 }}
@@ -141,23 +128,23 @@ function Register({ navigation }) {
                   <MyCheckBox ref={checkBoxRef} />
                   <Text
                     style={tw`font-qs-semibold text-${theme.text} text-[16px] ml-3`}>
-                    Remember me
+                    Nhớ đăng nhập
                   </Text>
                 </TouchableOpacity>
               </View>
               <MyButton
                 style={tw`mt-10`}
-                title={'Sign up'}
+                title={'Đăng ký'}
                 onPress={handleSubmit(onSubmit)}
                 // onPress={test}
               />
               <View style={tw`flex-row justify-center items-center mt-22`}>
                 <Text style={tw`font-qs-medium text-sm text-${theme.text}`}>
-                  Already have a Account?
+                  Bạn đã có tài khoản?
                 </Text>
                 <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                   <Text style={tw`font-qs-bold ml-1 text-base text-blue`}>
-                    Sign in
+                    Đăng nhập
                   </Text>
                 </TouchableOpacity>
               </View>

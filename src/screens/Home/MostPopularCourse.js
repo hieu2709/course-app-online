@@ -1,7 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { useRef } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Icon from '~/base/Icon';
 import TabBarCourse from '~/components/Course/TabBarCourse';
 import useTheme from '~/hooks/useTheme';

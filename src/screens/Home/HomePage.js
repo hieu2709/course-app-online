@@ -1,16 +1,6 @@
 import React from 'react';
-import { useRef } from 'react';
-import {
-  Animated,
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
@@ -35,10 +25,12 @@ function HomePage({ navigation }) {
               />
               <View style={tw`ml-4`}>
                 <View style={tw`flex-row`}>
-                  <Text style={tw`font-qs-regular text-lg text-gray mr-1`}>
-                    Hello
+                  <Text style={tw`font-qs-regular text-lg text-gray mr-1 `}>
+                    Xin chào
                   </Text>
-                  <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
+                  <Text
+                    numberOfLines={1}
+                    style={tw`font-qs-bold text-lg text-${theme.text}  w-[70%]`}>
                     {user?.fullname}
                   </Text>
                 </View>
@@ -68,7 +60,7 @@ function HomePage({ navigation }) {
               color={tw.color('gray')}
             />
             <Text style={tw`font-qs-bold text-base text-gray ml-3`}>
-              Search...
+              Tìm kiếm...
             </Text>
           </TouchableOpacity>
         </View>

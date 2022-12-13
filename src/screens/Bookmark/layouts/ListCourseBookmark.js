@@ -1,30 +1,18 @@
-import { useIsFocused } from '@react-navigation/native';
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
+import { collection, query, where } from 'firebase/firestore';
 import React from 'react';
-import { useState } from 'react';
-import { useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import ItemCourse from '~/components/Course/ItemCourse';
 import { db } from '~/firebase/config';
 import useUser from '~/hooks/useUser';
-import { useRefreshOnFocus } from '~/utils/hooks';
 
 function ListCourseBookmark() {
-  const [ListCourse, setListCourse] = useState([]);
   const { user } = useUser();
   const docRef = collection(db, 'mycourse');
   const q = query(
     docRef,
     where('isBookmark', '==', true),
-    where('userId', '==', user?.userId),
+    where('userId', '==', user?.userId || ''),
   );
   const { data: myCourseBookmark, refetch } = useFirestoreQuery(
     ['mycourse-bookmark'],

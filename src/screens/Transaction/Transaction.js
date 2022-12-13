@@ -1,4 +1,3 @@
-import { async } from '@firebase/util';
 import { doc, setDoc } from 'firebase/firestore';
 import React from 'react';
 import { useRef } from 'react';
@@ -22,6 +21,7 @@ function Transaction() {
   const {
     control,
     handleSubmit,
+    resetField,
     formState: { errors },
   } = useForm({
     defaultValues: {},
@@ -34,12 +34,13 @@ function Transaction() {
     };
     try {
       setUser(param);
-      const userRef = doc(db, 'users', user?.username);
+      const userRef = doc(db, 'users', user?.userId?.toString());
       setDoc(userRef, { coins: coins }, { merge: true });
       toastRef?.current?.open(
         true,
         `Bạn đã nạp ${formatNumber(data?.coins)} đ thành công!`,
       );
+      resetField('coins');
     } catch (e) {
       console.log('error transaction', e);
       toastRef?.current?.open(false, 'Nạp tiền thất bại!');
