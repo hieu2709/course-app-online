@@ -28,7 +28,7 @@ function TopMentor() {
           <Text style={tw`font-qs-bold text-${theme.text} text-lg`}>
             Giáo viên nổi bật
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('TopMentors')}>
+          <TouchableOpacity onPress={() => navigation.navigate('AllMentor')}>
             <Text style={tw`font-qs-bold text-blue text-base`}>Tất cả</Text>
           </TouchableOpacity>
         </View>

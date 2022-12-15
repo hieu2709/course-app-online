@@ -58,7 +58,6 @@ function DetailCourse({ navigation, route }) {
       let times = 0;
       snapshot.forEach(d => (times += d.data().time));
       setTotalTime(times);
-      return times;
     };
     getTotalTime();
   }, [data.courseID, lessonsRef]);

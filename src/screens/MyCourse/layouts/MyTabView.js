@@ -17,8 +17,8 @@ function MyTabView({ onScroll }) {
   const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'ongoing', title: 'Ongoing' },
-    { key: 'completed', title: 'Completed' },
+    { key: 'ongoing', title: 'Đang học' },
+    { key: 'completed', title: 'Đã hoàn thành' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {

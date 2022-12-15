@@ -103,15 +103,15 @@ function DetailMentor({ navigation, route }) {
                 Học sinh
               </Text>
             </View>
-            <View style={tw`w-[1px] h-full bg-gray-border`} />
-            <View style={tw`items-center`}>
+            {/* <View style={tw`w-[1px] h-full bg-gray-border`} /> */}
+            {/* <View style={tw`items-center`}>
               <Text style={tw`font-qs-bold text-2xl mb-2 text-${theme.text}`}>
                 {formatNumber(9273)}
               </Text>
               <Text style={tw`font-qs-medium text-${theme.text}`}>
                 Đánh giá
               </Text>
-            </View>
+            </View> */}
           </View>
           {/* <View style={tw`flex-row mx-5 mt-5 `}>
             <MyButton

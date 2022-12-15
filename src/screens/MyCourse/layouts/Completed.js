@@ -38,17 +38,7 @@ const listCourse = [
   },
 ];
 function Completed() {
-  return (
-    <View style={tw`flex-1`}>
-      <ScrollView
-        contentContainerStyle={tw`pt-5`}
-        showsVerticalScrollIndicator={false}>
-        {listCourse?.map((item, i) => (
-          <Courses key={i} item={item} />
-        ))}
-      </ScrollView>
-    </View>
-  );
+  return <View style={tw`flex-1`} />;
 }
 
 export default Completed;

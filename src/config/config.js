@@ -34,6 +34,11 @@ export const config = [
     component: require('~/screens/Transaction/Transaction').default,
     options: {},
   },
+  {
+    name: 'AllMentor',
+    component: require('~/screens/All/AllMentor').default,
+    options: {},
+  },
 ];
 export const noLogin = [
   {
