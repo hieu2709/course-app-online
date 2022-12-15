@@ -10,8 +10,7 @@ import CategoryCourse from '~/components/Course/CategoryCourse';
 
 function Header({ handleBookmark, isBookmark }) {
   const { theme } = useTheme();
-  const { course } = useCourse();
-  const { totalTime } = useCourse();
+  const { course, totalTime, countStudent } = useCourse();
 
   return (
     <View>
@@ -79,7 +78,7 @@ function Header({ handleBookmark, isBookmark }) {
             color={tw.color('blue')}
           />
           <Text style={tw`font-qs-medium ml-1 text-${theme.text}`}>
-            {formatNumber(course.students || 0)} Học sinh
+            {formatNumber(countStudent || 0)} Học sinh
           </Text>
         </View>
         <View style={tw`flex-row items-center`}>

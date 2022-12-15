@@ -13,14 +13,14 @@ import Lessons from './Lessons';
 //   reviews: Reviews,
 // });
 
-function MyTabView({ onScroll }) {
+function MyTabView({ courseId }) {
   const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([{ key: 'lessons', title: 'Lessons' }]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'lessons':
-        return <Lessons jumpTo={jumpTo} />;
+        return <Lessons jumpTo={jumpTo} courseId={courseId} />;
 
       default:
         return null;

@@ -56,7 +56,7 @@ function Courses({ userId, courseId }) {
     };
     getCountLesson();
     getTotalTime();
-  }, []);
+  }, [courseId, lessonsRef]);
   // console.log(1);
   // const percent = (
   //   ((item.progress || 0) / (item.totalLesson || 1)) *
@@ -75,18 +75,18 @@ function Courses({ userId, courseId }) {
   //     return 'blue';
   //   }
   // };
-  // const goToDetail = () => {
-  //   navigation.navigate('DetailMyCourse', {
-  //     data: item,
-  //   });
-  // };
+  const goToDetail = item => {
+    navigation.navigate('DetailMyCourse', {
+      data: item,
+    });
+  };
   // console.log(data?.data());
   if (isLoading || isLoadingCourse) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
     return (
       <TouchableOpacity
-        // onPress={goToDetail}
+        onPress={() => goToDetail(course?.data())}
         style={tw`flex-row items-center mx-5 p-4 mb-5 rounded-2xl bg-${theme.bgInput} shadow-2xl`}>
         <Image
           style={tw`w-20 h-20 rounded-xl`}

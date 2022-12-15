@@ -1,7 +1,15 @@
-import { useFirestoreQuery } from '@react-query-firebase/firestore';
-import { collection, orderBy, query, where } from 'firebase/firestore';
+import { useFirestoreInfiniteQuery } from '@react-query-firebase/firestore';
+import {
+  collection,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  where,
+} from 'firebase/firestore';
 import React from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { FlatList, TouchableOpacity, View } from 'react-native';
+import MyLoading from '~/base/components/MyLoading';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 import Icon from '~/base/Icon';
 import ButtonEnrolCourse from '~/components/ButtonEnrollCourse';
@@ -18,12 +26,52 @@ function AllLesson({ navigation, route }) {
   const lessonsRef = collection(db, 'lessons');
   const ref = query(
     lessonsRef,
-    where('courseId', '==', course.courseID),
+    where('courseId', '==', course?.courseID || ''),
     orderBy('lessonId'),
+    limit(7),
   );
-  const { data, isLoading } = useFirestoreQuery(
-    ['lessons', course.courseID],
-    ref,
+  const { data, isLoading, hasNextPage, fetchNextPage } =
+    useFirestoreInfiniteQuery(
+      ['lessons-infinite', course?.courseID],
+      ref,
+      snapshot => {
+        const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+        if (!lastDocument) {
+          return;
+        } else {
+          return query(ref, startAfter(lastDocument));
+        }
+      },
+    );
+  const list = () => {
+    let paginatedData = [];
+    data?.pages?.forEach(page => {
+      page?.docs?.forEach(char => {
+        paginatedData.push(char?.data());
+      });
+    });
+    return paginatedData;
+  };
+  const renderLoader = () => {
+    if (hasNextPage) {
+      return <MyLoading />;
+    } else {
+      return null;
+    }
+  };
+  const loadMore = () => {
+    // console.log("load more", hasNextPage);
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  };
+  const renderItem = item => (
+    <View
+      style={tw`bg-${
+        item?.index % 2 === 0 ? theme.bg : theme.bgInput
+      } mx-5 my-1 py-2  justify-center rounded`}>
+      <ItemLesson item={item?.item} />
+    </View>
   );
   if (isLoading) {
     return <MyLoadingFull text={'Đang tải dữ liệu...'} />;
@@ -44,17 +92,15 @@ function AllLesson({ navigation, route }) {
             </TouchableOpacity>
           }
         />
-        <ScrollView
-          style={tw`flex-1`}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}>
-          <View style={tw`mx-5 pt-1`}>
-            {data?.docs?.map((item, i) => (
-              <ItemLesson key={i} item={item.data()} style={tw`mb-5`} />
-            ))}
-          </View>
-        </ScrollView>
-        <ButtonEnrolCourse />
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={list()}
+          renderItem={renderItem}
+          keyExtractor={item => item?.lessonId}
+          onEndReached={loadMore}
+          ListFooterComponent={renderLoader}
+        />
+        {/* <ButtonEnrolCourse /> */}
       </Container>
     );
   }

@@ -2,9 +2,19 @@ import { useNavigation } from '@react-navigation/native';
 import {
   useFirestoreDocument,
   useFirestoreDocumentMutation,
+  useFirestoreQuery,
 } from '@react-query-firebase/firestore';
-import { doc, getDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getCountFromServer,
+  getDoc,
+  query,
+  where,
+} from 'firebase/firestore';
 import React from 'react';
+import { useState } from 'react';
+import { useEffect } from 'react';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
@@ -23,7 +33,6 @@ function ItemCourse({ courseId, canPress = true }) {
   const navigation = useNavigation();
   const modalRef = useRef();
   const { user } = useUser();
-
   const docRef = doc(
     db,
     'mycourse',
@@ -34,11 +43,20 @@ function ItemCourse({ courseId, canPress = true }) {
     ['course', courseId],
     courseRef,
   );
-
+  const myCourseRef = query(
+    collection(db, 'mycourse'),
+    where('status', '!=', 0),
+  );
+  const { data: listMyCourse, isLoadingListMyCourse } = useFirestoreQuery(
+    ['mycourse'],
+    myCourseRef,
+    { subscribe: true },
+  );
   const { data: myCourse, refetch } = useFirestoreDocument(
     ['mycourse', user?.userId?.toString() + courseId?.toString()],
     docRef,
   );
+
   const mutationCourse = useFirestoreDocumentMutation(
     docRef,
     { merge: true },
@@ -146,8 +164,8 @@ function ItemCourse({ courseId, canPress = true }) {
               color={tw.color('yellow')}
             />
             <Text style={tw`font-qs-medium ml-2 text-${theme.text}`}>
-              {course?.data()?.rate} | {formatNumber(course?.data()?.students)}{' '}
-              học sinh
+              {course?.data()?.rate} |{' '}
+              {formatNumber(listMyCourse?.docs?.length)} học sinh
             </Text>
           </View>
         </View>

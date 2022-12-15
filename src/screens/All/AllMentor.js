@@ -17,7 +17,7 @@ function AllMentor() {
   const collectionRef = collection(db, 'mentors');
   const mentorQuery = query(collectionRef, limit(2));
   const { data, isLoading, hasNextPage, fetchNextPage } =
-    useFirestoreInfiniteQuery('mentors', mentorQuery, snapshot => {
+    useFirestoreInfiniteQuery('mentors-infinite', mentorQuery, snapshot => {
       const lastDocument = snapshot.docs[snapshot.docs.length - 1];
       if (!lastDocument) {
         return;

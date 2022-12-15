@@ -28,7 +28,7 @@ function OnGoing() {
     limit(2),
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
-    useFirestoreInfiniteQuery('my-course-ongoing', Query, snapshot => {
+    useFirestoreInfiniteQuery('my-course-ongoing-infinite', Query, snapshot => {
       const lastDocument = snapshot.docs[snapshot.docs.length - 1];
       if (!lastDocument) {
         return;
