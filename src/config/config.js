@@ -39,6 +39,11 @@ export const config = [
     component: require('~/screens/All/AllMentor').default,
     options: {},
   },
+  {
+    name: 'DetailLesson',
+    component: require('~/screens/Detail/DetailLesson').default,
+    options: {},
+  },
 ];
 export const noLogin = [
   {

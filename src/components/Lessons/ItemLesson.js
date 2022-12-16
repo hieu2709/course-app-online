@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
@@ -5,8 +6,15 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import { convertMintoHrs } from '~/utils';
 
-function ItemLesson({ item, style }) {
+function ItemLesson({ item, style, index }) {
   const { theme } = useTheme();
+  const navigation = useNavigation();
+  const gotoDetailLesson = () => {
+    navigation.navigate('DetailLesson', {
+      data: item,
+      index: index + 1,
+    });
+  };
   return (
     <View
       style={[
@@ -31,7 +39,7 @@ function ItemLesson({ item, style }) {
           </Text>
         </View>
       </View>
-      <TouchableOpacity style={tw`shadow-xl`}>
+      <TouchableOpacity style={tw`shadow-xl`} onPress={gotoDetailLesson}>
         <Icon
           type="Ionicons"
           name="play-circle"

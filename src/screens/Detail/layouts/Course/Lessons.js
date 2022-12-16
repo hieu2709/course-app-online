@@ -49,7 +49,12 @@ function Lessons() {
           showsVerticalScrollIndicator={false}>
           <View style={tw`mx-5 pt-2.5`}>
             {data?.docs?.map((item, i) => (
-              <ItemLesson key={i} item={item.data()} style={tw`mb-5`} />
+              <ItemLesson
+                key={i}
+                index={i}
+                item={item.data()}
+                style={tw`mb-5`}
+              />
             ))}
           </View>
         </ScrollView>

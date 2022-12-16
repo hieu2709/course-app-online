@@ -62,7 +62,7 @@ function Lessons({ courseId }) {
       style={tw`bg-${
         item?.index % 2 === 0 ? theme.bg : theme.bgInput
       } mx-5 my-1 py-2  justify-center rounded`}>
-      <ItemLesson item={item?.item} />
+      <ItemLesson item={item?.item} index={item?.index} />
     </View>
   );
   if (isLoading) {

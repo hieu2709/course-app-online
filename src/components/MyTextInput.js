@@ -15,6 +15,8 @@ function MyTextInput(
     rightIcon,
     capitalize = false,
     type,
+    onFocus,
+    onBlur,
   },
   ref,
 ) {
@@ -93,8 +95,14 @@ function MyTextInput(
         )}
       </View>
       <TextInput
-        onFocus={() => setIsFocus(!isFocus)}
-        onBlur={() => setIsFocus(!isFocus)}
+        onFocus={() => {
+          setIsFocus(true);
+          onFocus?.();
+        }}
+        onBlur={() => {
+          setIsFocus(false);
+          onBlur?.();
+        }}
         autoCapitalize={capitalize}
         secureTextEntry={isPassword && isHide}
         keyboardType={type}
