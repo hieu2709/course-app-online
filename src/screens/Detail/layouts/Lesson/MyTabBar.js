@@ -1,29 +1,33 @@
 import React from 'react';
+import { forwardRef } from 'react';
 import { useState } from 'react';
 import { Text } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
-import About from './About';
-import Lessons from './Lessons';
-import Reviews from './Reviews';
+import Comment from './Comment';
+import Note from './Note';
 
-function MyTabBar() {
+function MyTabBar({ videoRef, pause, resume }) {
   const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'about', title: 'Thông tin' },
-    { key: 'lessons', title: 'Bài học' },
-    { key: 'reviews', title: 'Đánh giá' },
+    { key: 'note', title: 'Ghi chú' },
+    { key: 'comment', title: 'Bình luận' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
-      case 'about':
-        return <About jumpTo={jumpTo} />;
-      case 'lessons':
-        return <Lessons jumpTo={jumpTo} />;
-      case 'reviews':
-        return <Reviews jumpTo={jumpTo} />;
+      case 'note':
+        return (
+          <Note
+            jumpTo={jumpTo}
+            videoRef={videoRef}
+            pause={pause}
+            resume={resume}
+          />
+        );
+      case 'comment':
+        return <Comment jumpTo={jumpTo} />;
 
       default:
         return null;

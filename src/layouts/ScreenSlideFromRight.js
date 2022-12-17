@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { forwardRef } from 'react';
 import { useImperativeHandle } from 'react';
 import { useState } from 'react';
-import { Animated, Modal, useWindowDimensions } from 'react-native';
+import { Animated, useWindowDimensions } from 'react-native';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 

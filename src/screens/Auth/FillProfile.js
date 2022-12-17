@@ -56,10 +56,9 @@ function FillProfile({ navigation, route }) {
       setIsLoading(false);
     }
   };
-  const setUserStorage = async user => {
+  const setUserStorage = async id => {
     try {
-      const jsonValue = JSON.stringify(user);
-      await AsyncStorage.setItem('user', jsonValue);
+      await AsyncStorage.setItem('user', id.toString());
     } catch (e) {
       console.log('error setItem:', e);
     }
@@ -92,10 +91,10 @@ function FillProfile({ navigation, route }) {
         userId: id,
       };
       try {
-        await setDoc(doc(db, 'users', username), params);
+        await setDoc(doc(db, 'users', id?.toString()), params);
         await setDoc(doc(db, 'users', '0'), { id: id });
         if (isRemember) {
-          setUserStorage(params);
+          setUserStorage(id);
         }
         setIsLoading(false);
         alertRef?.current?.openModal();
@@ -129,12 +128,12 @@ function FillProfile({ navigation, route }) {
             }}>
             <Text
               style={tw`text-${theme.text} text-center font-qs-semibold text-base`}>
-              Select from gallery
+              Chọn từ thư viện
             </Text>
           </TouchableOpacity>
         </View>
       </ModalCenter>
-      <ButtonBack style={tw`pt-3 pl-5`} title={'Fill Your Profile'} />
+      <ButtonBack style={tw`pt-3 pl-5`} title={'Nhập thông tin của bạn'} />
       <KeyboardAvoidingView
         style={tw`flex-1`}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -167,7 +166,7 @@ function FillProfile({ navigation, route }) {
                 render={({ field: { onChange, value } }) => (
                   <MyTextInput
                     capitalize={true}
-                    placeholder={'Full Name'}
+                    placeholder={'Tên đầy đủ'}
                     onChangeText={onChange}
                     value={value}
                   />
@@ -208,13 +207,13 @@ function FillProfile({ navigation, route }) {
       </KeyboardAvoidingView>
       <MyButton
         style={tw`mb-15 mx-5`}
-        title={'Continue'}
+        title={'Hoàn tất'}
         onPress={handleSubmit(onSubmit)}
       />
       <AlertMessage
         ref={alertRef}
-        title={'Congratulations!'}
-        message="Your account is ready to use. You will be redirected to the Home page in a few seconds."
+        title={'Chúc mừng!'}
+        message="Tài khoản của bạn đã sẵn sàng để sử dụng. Bạn sẽ được chuyển hướng đến trang chủ sau vài giây."
         icon={
           <Icon
             type="FontAwesome"
@@ -224,7 +223,7 @@ function FillProfile({ navigation, route }) {
           />
         }
       />
-      {isLoading && <MyLoadingFull text={'Registering...'} />}
+      {isLoading && <MyLoadingFull text={'Đang tạo tài khoản...'} />}
     </Container>
   );
 }

@@ -18,7 +18,7 @@ function MyCourse() {
             <Image style={tw`w-4 h-4`} source={require('~/assets/logo.png')} />
           </View>
           <Text style={tw`ml-3 font-qs-bold text-xl text-${theme.text}`}>
-            My Courses
+            Khóa học của tôi
           </Text>
         </View>
         <View style={tw`flex-row items-center`}>

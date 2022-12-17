@@ -9,7 +9,9 @@ function MyLoadingFull({ text }) {
       <View
         style={tw`w-40 rounded-xl py-2 bg-[#00000080] justify-center items-center`}>
         <LoadingIcon style={tw`w-20 py-10`} />
-        {text && <Text style={tw`font-qs-bold text-blue`}>{text}</Text>}
+        {text && (
+          <Text style={tw`font-qs-bold text-blue text-center`}>{text}</Text>
+        )}
       </View>
     </View>
   );

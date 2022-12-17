@@ -1,14 +1,10 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { collection, limit, query, where } from 'firebase/firestore';
 import React from 'react';
-import { useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
-import Icon from '~/base/Icon';
 import { db } from '~/firebase/config';
-import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
-import { formatNumber } from '~/utils';
 import ItemCourse from './ItemCourse';
 
 function SceneCourse({ categoryId }) {
@@ -22,12 +18,12 @@ function SceneCourse({ categoryId }) {
   );
 
   if (isLoading) {
-    return <MyLoading text={'Loading'} />;
+    return <MyLoading text={'Đang tải...'} />;
   } else {
     return (
       <ScrollView style={tw`flex-1`}>
         {data?.docs?.map((item, i) => (
-          <ItemCourse key={i} item={item?.data()} />
+          <ItemCourse key={i} courseId={item?.data()?.courseID} />
         ))}
       </ScrollView>
     );

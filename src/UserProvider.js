@@ -11,8 +11,7 @@ function UserProvider({ children }) {
     try {
       const value = await AsyncStorage.getItem('user');
       if (value) {
-        const JSONValue = JSON.parse(value);
-        const docRef = doc(db, 'users', JSONValue?.username);
+        const docRef = doc(db, 'users', value);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setUser(docSnap?.data());

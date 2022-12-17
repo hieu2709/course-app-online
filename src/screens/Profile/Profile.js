@@ -8,6 +8,7 @@ import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
+import { formatNumber } from '~/utils';
 import RowSection from './components/RowSection';
 
 function Profile({ navigation }) {
@@ -29,7 +30,7 @@ function Profile({ navigation }) {
             <Image style={tw`w-4 h-4`} source={require('~/assets/logo.png')} />
           </View>
           <Text style={tw`ml-3 font-qs-bold text-xl text-${theme.text}`}>
-            Profile
+            Hồ sơ cá nhân
           </Text>
         </View>
         <TouchableOpacity
@@ -52,6 +53,17 @@ function Profile({ navigation }) {
         <Text style={tw`font-qs-bold mt-3 text-xl text-${theme.text}`}>
           {user?.fullname}
         </Text>
+        <View style={tw`flex-row items-center  mt-1 `}>
+          <Icon
+            type="FontAwesome5"
+            name="coins"
+            size={16}
+            color={tw.color('yellow')}
+          />
+          <Text style={tw`font-qs-semibold ml-3 text-xl text-yellow`}>
+            {formatNumber(user?.coins)} đ
+          </Text>
+        </View>
       </View>
       <View style={tw`pt-2.5`}>
         <RowSection
@@ -61,7 +73,21 @@ function Profile({ navigation }) {
           icon={
             <Icon type="AntDesign" name="user" size={22} color={theme.text} />
           }
-          title={'Edit Profile'}
+          title={'Sửa thông tin cá nhân'}
+        />
+        <RowSection
+          onPress={() => {
+            navigation.navigate('Transaction');
+          }}
+          icon={
+            <Icon
+              type="FontAwesome5"
+              name="coins"
+              size={22}
+              color={theme.text}
+            />
+          }
+          title={'Nạp tiền'}
         />
         <RowSection
           icon={
@@ -72,7 +98,7 @@ function Profile({ navigation }) {
               color={theme.text}
             />
           }
-          title={'Language'}
+          title={'Ngôn ngữ'}
         />
         <TouchableOpacity
           style={tw`flex-row justify-between items-center mx-5 py-2.5 border-b-[0.2px] border-gray-border`}>
@@ -86,7 +112,7 @@ function Profile({ navigation }) {
               />
             </View>
             <Text style={tw`font-qs-semibold text-base text-${theme.text}`}>
-              Dark mode
+              Chế độ tối
             </Text>
           </View>
         </TouchableOpacity>
@@ -102,7 +128,7 @@ function Profile({ navigation }) {
                 color={tw.color('red')}
               />
             </View>
-            <Text style={tw`font-qs-bold text-base text-red`}>Logout</Text>
+            <Text style={tw`font-qs-bold text-base text-red`}>Đăng xuất</Text>
           </View>
         </TouchableOpacity>
       </View>

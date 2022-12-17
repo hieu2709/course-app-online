@@ -12,7 +12,7 @@ export default [
         return <Icon type="Ionicons" name="home" size={24} color={color} />;
       },
       tabBarActiveTintColor: tw.color('blue'),
-      tabBarLabel: 'Home',
+      tabBarLabel: 'Trang chủ',
 
       // tabBarActiveBackgroundColor: COLOR.THEM_SOFT,
     },
@@ -32,7 +32,7 @@ export default [
         );
       },
       tabBarActiveTintColor: tw.color('blue'),
-      tabBarLabel: 'My Course',
+      tabBarLabel: 'Khóa học của tôi',
 
       // tabBarActiveBackgroundColor: COLOR.THEM_SOFT,
     },
@@ -47,7 +47,7 @@ export default [
         );
       },
       tabBarActiveTintColor: tw.color('blue'),
-      tabBarLabel: 'Bookmark',
+      tabBarLabel: 'Đánh dấu',
 
       // tabBarActiveBackgroundColor: COLOR.THEM_SOFT,
     },
@@ -60,7 +60,7 @@ export default [
         return <Icon type="FontAwesome" name="user" size={24} color={color} />;
       },
       tabBarActiveTintColor: tw.color('blue'),
-      tabBarLabel: 'Profile',
+      tabBarLabel: 'Cá nhân',
 
       // tabBarActiveBackgroundColor: COLOR.THEM_SOFT,
     },

@@ -12,11 +12,11 @@ function MostPopularCourse({ style }) {
     <View style={[tw`flex-1`, style]}>
       <View style={tw`flex-row items-center justify-between px-5 mb-5`}>
         <Text style={tw`font-qs-bold text-${theme.text} text-lg`}>
-          Most Popular Courses
+          Khóa học phổ biến
         </Text>
         <TouchableOpacity
           onPress={() => navigation.navigate('MostPopularCourse')}>
-          <Text style={tw`font-qs-bold text-blue text-base`}>See All</Text>
+          <Text style={tw`font-qs-bold text-blue text-base`}>Tất cả</Text>
         </TouchableOpacity>
       </View>
       <View style={tw`flex-1 `}>

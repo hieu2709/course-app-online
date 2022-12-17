@@ -7,25 +7,20 @@ import tw from '~/libs/tailwind';
 import Courses from './Courses';
 import Reviews from './Reviews';
 import Students from './Students';
-// const renderScene = SceneMap({
-//   about: About,
-//   lessons: Lessons,
-//   reviews: Reviews,
-// });
 
-function MyTabBar({ onScroll }) {
+function MyTabBar({ mentorId }) {
   const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
-    { key: 'courses', title: 'Courses' },
-    { key: 'students', title: 'Students' },
+    { key: 'courses', title: 'Khóa học' },
+    { key: 'students', title: 'Học sinh' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'courses':
-        return <Courses jumpTo={jumpTo} />;
+        return <Courses jumpTo={jumpTo} mentorId={mentorId} />;
       case 'students':
-        return <Students jumpTo={jumpTo} />;
+        return <Students jumpTo={jumpTo} mentorId={mentorId} />;
       default:
         return null;
     }

@@ -10,7 +10,8 @@ import MyTabView from './layouts/DetailMyCourse/MyTabView';
 function DetailMyCourse({ navigation, route }) {
   const { data } = route.params || '';
   const { theme } = useTheme();
-  const title = data?.courseName || 'Lessons';
+  const title = data?.courseName || 'Các bài học';
+
   return (
     <Container>
       <Header
@@ -28,7 +29,7 @@ function DetailMyCourse({ navigation, route }) {
         }
       />
       <View style={tw`flex-1`}>
-        <MyTabView />
+        <MyTabView courseId={data?.courseID} />
       </View>
     </Container>
   );

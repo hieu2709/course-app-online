@@ -29,6 +29,21 @@ export const config = [
     component: require('~/screens/Profile/EditProfile').default,
     options: {},
   },
+  {
+    name: 'Transaction',
+    component: require('~/screens/Transaction/Transaction').default,
+    options: {},
+  },
+  {
+    name: 'AllMentor',
+    component: require('~/screens/All/AllMentor').default,
+    options: {},
+  },
+  {
+    name: 'DetailLesson',
+    component: require('~/screens/Detail/DetailLesson').default,
+    options: {},
+  },
 ];
 export const noLogin = [
   {

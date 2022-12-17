@@ -46,6 +46,7 @@
     "react-native-gesture-handler": "~2.5.0",
     "react-native-global-font": "^1.0.3",
     "react-native-gradient-icon": "^0.2.1",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-modal-datetime-picker": "^14.0.0",
     "react-native-pager-view": "5.4.24",

@@ -8,16 +8,10 @@ import SceneCourse from './SceneCourse';
 function TabBarCourse() {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
-  // const renderScene = SceneMap({
-  //   all: SceneCourse,
-  //   design3d: SceneCourse,
-  //   bussiness: SceneCourse,
-  //   programming: SceneCourse,
-  // });
   const [routes] = useState([
     { key: 'all', title: 'All' },
     { key: 'design3d', title: '3D Design' },
-    { key: 'bussiness', title: 'Bussiness' },
+    { key: 'bussiness', title: 'Kinh doanh' },
     // { key: 'programming', title: 'Programming' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
