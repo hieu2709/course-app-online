@@ -8,7 +8,6 @@ import {
 } from 'firebase/firestore';
 import React from 'react';
 import { useState } from 'react';
-import { useCallback } from 'react';
 import { useEffect } from 'react';
 import { ScrollView, Text } from 'react-native';
 import ItemCourse from '~/components/Course/ItemCourse';

@@ -5,8 +5,6 @@ import {
 } from '@react-query-firebase/firestore';
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import React from 'react';
-import { useState } from 'react';
-import { useEffect } from 'react';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
@@ -25,7 +23,6 @@ function ItemCourse({ item, canPress = true }) {
   const modalRef = useRef();
   const { user } = useUser();
   const isFocused = useIsFocused();
-  const [isBookmark, setIsBookmark] = useState(false);
   const categoryRef = doc(
     collection(db, 'category'),
     item?.categoryId?.toString(),
@@ -43,14 +40,8 @@ function ItemCourse({ item, canPress = true }) {
     ['mycourse', user?.userId?.toString() + item.courseID.toString()],
     docRef,
   );
-  useEffect(() => {
-    if (myCourse?.exists()) {
-      setIsBookmark(myCourse?.data()?.isBookmark);
-    }
-  }, [myCourse]);
-  useEffect(() => {
-    console.log(1);
-  }, [isFocused]);
+  useRefreshOnFocus(refetch);
+  console.log(myCourse.data());
   const mutationCourse = useFirestoreDocumentMutation(docRef, { merge: true });
   const handleBookmark = async () => {
     const docsnap = await getDoc(docRef);
@@ -58,13 +49,8 @@ function ItemCourse({ item, canPress = true }) {
       if (docsnap.data().isBookmark) {
         modalRef?.current?.open();
       } else {
-        setDoc(docRef, { isBookmark: true }, { merge: true });
-        // const params = {
-        //   ...myCourse?.data(),
-        //   isBookmark: true,
-        // };
         mutationCourse.mutate({ isBookmark: true });
-        setIsBookmark(true);
+        // setIsBookmark(true);
         // setMyCourse(params);
       }
     } else {
@@ -74,9 +60,8 @@ function ItemCourse({ item, canPress = true }) {
         isBookmark: true,
         status: 0,
       };
-      setDoc(docRef, params);
       mutationCourse.mutate(params);
-      setIsBookmark(true);
+      // setIsBookmark(true);
       // setMyCourse(params);
     }
   };
@@ -84,14 +69,9 @@ function ItemCourse({ item, canPress = true }) {
     modalRef?.current?.close();
   };
   const handleRemoveBookmark = () => {
-    setDoc(docRef, { isBookmark: false }, { merge: true });
-    // const params = {
-    //   ...myCourse,
-    //   isBookmark: false,
-    // };
+    console.log('remove');
     mutationCourse.mutate({ isBookmark: false });
-    setIsBookmark(false);
-    // setMyCourse(params);
+    // setIsBookmark(false);
     modalRef?.current?.close();
   };
   const onPress = () => {
@@ -117,7 +97,7 @@ function ItemCourse({ item, canPress = true }) {
             </Text>
           </View>
           <TouchableOpacity disabled={!canPress} onPress={handleBookmark}>
-            {isBookmark ? (
+            {myCourse?.data?.isBookmark ? (
               <Icon
                 type="Ionicons"
                 name="ios-bookmark"
