@@ -23,7 +23,7 @@ function Lessons({ courseId }) {
   const ref = query(
     lessonsRef,
     where('courseId', '==', courseId || ''),
-    orderBy('lessonId'),
+    orderBy('index'),
     limit(6),
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
@@ -62,7 +62,7 @@ function Lessons({ courseId }) {
       style={tw`bg-${
         item?.index % 2 === 0 ? theme.bg : theme.bgInput
       } mx-5 my-1 py-2  justify-center rounded`}>
-      <ItemLesson item={item?.item} index={item?.index} />
+      <ItemLesson item={item?.item} />
     </View>
   );
   if (isLoading) {

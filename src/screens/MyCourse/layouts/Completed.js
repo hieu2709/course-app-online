@@ -1,44 +1,95 @@
+import { useFirestoreInfiniteQuery } from '@react-query-firebase/firestore';
+import {
+  collection,
+  limit,
+  query,
+  startAfter,
+  where,
+} from 'firebase/firestore';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { FlatList, View } from 'react-native';
+import MyLoading from '~/base/components/MyLoading';
+import MyLoadingFull from '~/base/components/MyLoadingFull';
+import { db } from '~/firebase/config';
+import useTheme from '~/hooks/useTheme';
+import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 import Courses from '../components/Courses';
 
-const listCourse = [
-  {
-    image:
-      'https://assets-global.website-files.com/5e39e095596498a8b9624af1/5ffca6e3e0d8ad9231cc2af6_Portfolio-course---final.png',
-    courseName: '3D Design Illustration',
-    totalTime: 145,
-    totalLesson: 178,
-    progress: 178,
-  },
-  {
-    image:
-      'https://assets-global.website-files.com/5e39e095596498a8b9624af1/5ffca6e3e0d8ad9231cc2af6_Portfolio-course---final.png',
-    courseName: 'CRM Management',
-    totalTime: 145,
-    totalLesson: 178,
-    progress: 178,
-  },
-  {
-    image:
-      'https://assets-global.website-files.com/5e39e095596498a8b9624af1/5ffca6e3e0d8ad9231cc2af6_Portfolio-course---final.png',
-    courseName: 'Flutter Mobile Apps',
-    totalTime: 145,
-    totalLesson: 110,
-    progress: 110,
-  },
-  {
-    image:
-      'https://assets-global.website-files.com/5e39e095596498a8b9624af1/5ffca6e3e0d8ad9231cc2af6_Portfolio-course---final.png',
-    courseName: '3D Icons Set Blender',
-    totalTime: 145,
-    totalLesson: 67,
-    progress: 67,
-  },
-];
 function Completed() {
-  return <View style={tw`flex-1`} />;
+  const { theme } = useTheme();
+  const { user } = useUser();
+  const collectionRef = collection(db, 'mycourse');
+  const Query = query(
+    collectionRef,
+    where('userId', '==', user?.userId || ''),
+    where('status', '==', 2),
+    limit(5),
+  );
+  const { data, isLoading, hasNextPage, fetchNextPage } =
+    useFirestoreInfiniteQuery(
+      'my-course-completed-infinite',
+      Query,
+      snapshot => {
+        const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+        if (!lastDocument) {
+          return;
+        } else {
+          return query(Query, startAfter(lastDocument));
+        }
+      },
+    );
+
+  const list = () => {
+    let paginatedData = [];
+    data?.pages?.forEach(page => {
+      page?.docs?.forEach(char => {
+        paginatedData.push(char?.data());
+      });
+    });
+    return paginatedData;
+  };
+  const renderLoader = () => {
+    if (hasNextPage) {
+      return <MyLoading />;
+    } else {
+      return null;
+    }
+  };
+  const loadMore = () => {
+    // console.log("load more", hasNextPage);
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  };
+  const renderItem = item => {
+    // console.log(item);
+    return (
+      <View
+        style={tw`bg-${
+          item?.index % 2 === 0 ? theme.bg : theme.bgInput
+        } mx-5 my-1 py-2  justify-center rounded`}>
+        <Courses userId={item?.item?.userId} courseId={item?.item?.courseId} />
+      </View>
+    );
+  };
+  if (isLoading) {
+    return <MyLoading text={'Đang tải dữ liệu'} />;
+  } else {
+    return (
+      <View style={tw`flex-1`}>
+        <FlatList
+          data={list()}
+          renderItem={renderItem}
+          keyExtractor={item =>
+            item?.courseId?.toString() + item?.userId?.toString()
+          }
+          onEndReached={loadMore}
+          ListFooterComponent={renderLoader}
+        />
+      </View>
+    );
+  }
 }
 
 export default Completed;

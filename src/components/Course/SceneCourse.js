@@ -1,7 +1,7 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { collection, limit, query, where } from 'firebase/firestore';
 import React from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import { db } from '~/firebase/config';
 import tw from '~/libs/tailwind';
@@ -15,13 +15,16 @@ function SceneCourse({ categoryId }) {
   const { data, isLoading } = useFirestoreQuery(
     ['course-limit', categoryId || 'all'],
     ref,
+    { subscribe: true },
   );
-
+  // data?.docs?.map(d => console.log(d.data()));
   if (isLoading) {
     return <MyLoading text={'Đang tải...'} />;
   } else {
     return (
-      <ScrollView style={tw`flex-1`}>
+      <ScrollView
+        style={tw`flex-1 bg-blue`}
+        showsVerticalScrollIndicator={false}>
         {data?.docs?.map((item, i) => (
           <ItemCourse key={i} courseId={item?.data()?.courseID} />
         ))}
