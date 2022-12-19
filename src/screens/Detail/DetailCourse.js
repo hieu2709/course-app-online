@@ -26,6 +26,7 @@ import { db } from '~/firebase/config';
 import { useState } from 'react';
 import useUser from '~/hooks/useUser';
 import {
+  useFirestoreCollectionMutation,
   useFirestoreDocument,
   useFirestoreDocumentMutation,
   useFirestoreQuery,
@@ -54,13 +55,13 @@ function DetailCourse({ navigation, route }) {
   );
   const myCourseRef = query(
     collection(db, 'mycourse'),
+    where('userId', '==', user?.userId),
     where('status', '!=', 0),
   );
-  const { data: listMyCourse, isLoadingListMyCourse } = useFirestoreQuery(
-    ['mycourse'],
-    myCourseRef,
-    { subscribe: true },
-  );
+  const { data: listMyCourse, isLoading: isLoadingListMyCourse } =
+    useFirestoreQuery(['mycourse-enroll', data?.courseID], myCourseRef, {
+      subscribe: true,
+    });
   const totalTime = lessons?.docs?.reduce((total, current) => {
     return total + current?.data()?.time;
   }, 0);
@@ -79,6 +80,16 @@ function DetailCourse({ navigation, route }) {
     ['mycourse', user?.userId?.toString() + data.courseID.toString()],
     docRef,
   );
+  const lessonFirstRef = query(
+    collection(db, 'lessons'),
+    where('courseId', '==', data?.courseID),
+    where('index', '==', 1),
+  );
+  const { data: lessonsFirst } = useFirestoreQuery(
+    ['lessonFirst', data.courseID],
+    lessonFirstRef,
+  );
+  // console.log(lessonsFirst?.docs[0]?.data());
   const mutationCourse = useFirestoreDocumentMutation(
     docRef,
     { merge: true },
@@ -171,6 +182,19 @@ function DetailCourse({ navigation, route }) {
       userId,
       mentorID: mentorId,
     });
+    await setDoc(
+      doc(
+        db,
+        'mylesson',
+        userId?.toString() +
+          lessonsFirst?.docs[0]?.data()?.lessonId?.toString(),
+      ),
+      {
+        userId,
+        lessonId: lessonsFirst?.docs[0]?.data()?.lessonId,
+        status: 0,
+      },
+    );
   };
   if (isLoadingListMyCourse || isLoadingMyCourse || isLoadingLessons) {
     return <MyLoadingFull text={'Đang tải dữ liệu...'} />;
@@ -290,7 +314,7 @@ function DetailCourse({ navigation, route }) {
                     title={'Hủy'}
                     style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
                     titleColor={tw.color('blue')}
-                    onPress={() => handleCloseModal(notEnoughMoneyRef)}
+                    onPress={() => handleCloseModal(enrollCourseRef)}
                   />
                   <MyButton
                     title={'Đồng ý'}

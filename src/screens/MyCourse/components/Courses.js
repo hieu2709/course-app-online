@@ -18,21 +18,15 @@ import { Image, Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
+import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 import { convertMintoHrs } from '~/utils';
 
 function Courses({ userId, courseId }) {
   const { theme } = useTheme();
-  const [totalTime, setTotalTime] = useState(0);
-  const [countLesson, setCountLesson] = useState(0);
+  const { user } = useUser();
   const navigation = useNavigation();
-  const collectionRef = collection(db, 'mycourse');
-  const ref = doc(collectionRef, userId?.toString() + courseId?.toString());
-  const { data, isLoading } = useFirestoreDocument(
-    ['mycourse', userId?.toString() + courseId?.toString()],
-    ref,
-    { subscribe: true },
-  );
+
   const courseRef = doc(collection(db, 'courses'), courseId?.toString());
   const { data: course, isLoading: isLoadingCourse } = useFirestoreDocument(
     ['course', courseId],
@@ -42,46 +36,48 @@ function Courses({ userId, courseId }) {
     collection(db, 'lessons'),
     where('courseId', '==', courseId || ''),
   );
-  useEffect(() => {
-    const getTotalTime = async () => {
-      const q = query(lessonsRef, where('courseId', '==', courseId));
-      const snapshot = await getDocs(q);
-      let times = 0;
-      snapshot.forEach(d => (times += d.data().time));
-      setTotalTime(times);
-    };
-    const getCountLesson = async () => {
-      const snapshot = await getCountFromServer(lessonsRef);
-      setCountLesson(snapshot.data().count);
-    };
-    getCountLesson();
-    getTotalTime();
-  }, [courseId, lessonsRef]);
-  // console.log(1);
-  // const percent = (
-  //   ((item.progress || 0) / (item.totalLesson || 1)) *
-  //   100
-  // ).toFixed(0);
-  // const color = () => {
-  //   if (percent <= 25) {
-  //     return 'green';
-  //   } else if (percent <= 50) {
-  //     return 'yellow';
-  //   } else if (percent <= 75) {
-  //     return 'orange';
-  //   } else if (percent <= 99) {
-  //     return 'red';
-  //   } else {
-  //     return 'blue';
-  //   }
-  // };
+  const { data: lessons, isLoading: isLoadingLesson } = useFirestoreQuery(
+    ['lessons', courseId],
+    lessonsRef,
+    { subscribe: true },
+  );
+  const lessonsCompletedRef = query(
+    collection(db, 'mylesson'),
+    where('status', '==', 1),
+    where('userId', '==', user?.userId),
+  );
+  const { data: lessonsCompleted, isLoading: isLoadingLessonCompleted } =
+    useFirestoreQuery(['lessons-completed', courseId], lessonsCompletedRef, {
+      subscribe: true,
+    });
+  const totalTime = lessons?.docs?.reduce((total, current) => {
+    return total + current?.data()?.time;
+  }, 0);
+
+  const percent = (
+    ((lessonsCompleted?.docs?.length || 0) / (lessons?.docs?.length || 1)) *
+    100
+  ).toFixed(0);
+  const color = () => {
+    if (percent <= 25) {
+      return 'green';
+    } else if (percent <= 50) {
+      return 'yellow';
+    } else if (percent <= 75) {
+      return 'orange';
+    } else if (percent <= 99) {
+      return 'red';
+    } else {
+      return 'blue';
+    }
+  };
   const goToDetail = item => {
     navigation.navigate('DetailMyCourse', {
       data: item,
     });
   };
   // console.log(data?.data());
-  if (isLoading || isLoadingCourse) {
+  if (isLoadingCourse || isLoadingLesson || isLoadingLessonCompleted) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
     return (
@@ -104,12 +100,13 @@ function Courses({ userId, courseId }) {
           <View style={tw`flex-row items-center`}>
             <View style={tw`flex-1 h-2 rounded-xl bg-gray-border`}>
               <View
-              // style={[tw`h-full rounded-xl bg-${color()} w-[${percent}%]`]}
+                style={[tw`h-full rounded-xl bg-${color()} w-[${percent}%]`]}
               />
             </View>
             <Text
               style={tw`w-16 ml-2 font-qs-medium text-right text-${theme.text}`}>
-              {data?.data()?.progress || 0} / {countLesson || 0}
+              {lessonsCompleted?.docs?.length || 0} /{' '}
+              {lessons?.docs?.length || 0}
             </Text>
           </View>
         </View>

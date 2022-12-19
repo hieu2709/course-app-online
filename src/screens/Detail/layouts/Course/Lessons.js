@@ -17,7 +17,7 @@ function Lessons() {
   const ref = query(
     lessonsRef,
     where('courseId', '==', course.courseID),
-    orderBy('lessonId'),
+    orderBy('index'),
     limit(5),
   );
   const { data, isLoading } = useFirestoreQuery(
@@ -49,12 +49,7 @@ function Lessons() {
           showsVerticalScrollIndicator={false}>
           <View style={tw`mx-5 pt-2.5`}>
             {data?.docs?.map((item, i) => (
-              <ItemLesson
-                key={i}
-                index={i}
-                item={item.data()}
-                style={tw`mb-5`}
-              />
+              <ItemLesson key={i} item={item.data()} style={tw`mb-5`} />
             ))}
           </View>
         </ScrollView>

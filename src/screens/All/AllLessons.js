@@ -27,7 +27,7 @@ function AllLesson({ navigation, route }) {
   const ref = query(
     lessonsRef,
     where('courseId', '==', course?.courseID || ''),
-    orderBy('lessonId'),
+    orderBy('index'),
     limit(7),
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
@@ -70,7 +70,7 @@ function AllLesson({ navigation, route }) {
       style={tw`bg-${
         item?.index % 2 === 0 ? theme.bg : theme.bgInput
       } mx-5 my-1 py-2  justify-center rounded`}>
-      <ItemLesson item={item?.item} index={item?.index} />
+      <ItemLesson item={item?.item} />
     </View>
   );
   if (isLoading) {

@@ -4,17 +4,8 @@ import {
   useFirestoreDocumentMutation,
   useFirestoreQuery,
 } from '@react-query-firebase/firestore';
-import {
-  collection,
-  doc,
-  getCountFromServer,
-  getDoc,
-  query,
-  where,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, query, where } from 'firebase/firestore';
 import React from 'react';
-import { useState } from 'react';
-import { useEffect } from 'react';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
@@ -45,13 +36,15 @@ function ItemCourse({ courseId, canPress = true }) {
   );
   const myCourseRef = query(
     collection(db, 'mycourse'),
+    where('userId', '==', user?.userId),
+    where('courseId', '==', courseId),
     where('status', '!=', 0),
   );
-  const { data: listMyCourse, isLoadingListMyCourse } = useFirestoreQuery(
-    ['mycourse'],
-    myCourseRef,
-    { subscribe: true },
-  );
+  const { data: listMyCourse, isLoading: isLoadingListMyCourse } =
+    useFirestoreQuery(['mycourse-enroll', courseId], myCourseRef, {
+      subscribe: true,
+    });
+  // listMyCourse?.docs?.forEach(d => console.log(d.data()));
   const { data: myCourse, refetch } = useFirestoreDocument(
     ['mycourse', user?.userId?.toString() + courseId?.toString()],
     docRef,
@@ -102,14 +95,14 @@ function ItemCourse({ courseId, canPress = true }) {
       });
     }
   };
-  if (isLoading) {
+  if (isLoading || isLoadingListMyCourse) {
     return <MyLoading text={'Loading'} />;
   } else {
     return (
       <TouchableOpacity
         disabled={!canPress}
         onPress={() => onPress()}
-        style={tw`flex-row mx-5 bg-${theme.bgInput} p-5 rounded-3xl shadow-lg mt-5 `}>
+        style={tw`flex-row mx-5 bg-${theme.bgInput} p-5 rounded-3xl shadow-lg mt-5`}>
         <Image
           style={tw`w-30 h-30 rounded-xl`}
           source={{ uri: course?.data()?.image }}

@@ -7,10 +7,9 @@ import {
   where,
 } from 'firebase/firestore';
 import React from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
 import { FlatList, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
+import MyLoadingFull from '~/base/components/MyLoadingFull';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
@@ -20,12 +19,12 @@ import Courses from '../components/Courses';
 function OnGoing() {
   const { theme } = useTheme();
   const { user } = useUser();
-
   const collectionRef = collection(db, 'mycourse');
   const Query = query(
     collectionRef,
     where('userId', '==', user?.userId || ''),
-    limit(2),
+    where('status', '==', 1),
+    limit(5),
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
     useFirestoreInfiniteQuery('my-course-ongoing-infinite', Query, snapshot => {
@@ -71,7 +70,7 @@ function OnGoing() {
     );
   };
   if (isLoading) {
-    return <MyLoading />;
+    return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
     return (
       <View style={tw`flex-1`}>

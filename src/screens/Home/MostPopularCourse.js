@@ -25,7 +25,7 @@ function MostPopularCourse() {
           </TouchableOpacity>
         }
       />
-      <TabBarCourse scrollEnabled={true} />
+      <TabBarCourse />
     </Container>
   );
 }

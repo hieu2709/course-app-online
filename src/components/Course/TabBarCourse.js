@@ -1,5 +1,5 @@
 import React from 'react';
-import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
 import { useState } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 import tw from '~/libs/tailwind';
@@ -18,6 +18,7 @@ function TabBarCourse() {
     switch (route.key) {
       case 'all':
         return <SceneCourse jumpTo={jumpTo} />;
+      // return <View style={tw`flex-1 bg-green`} />;
       case 'design3d':
         return <SceneCourse jumpTo={jumpTo} categoryId={1} />;
       case 'bussiness':
@@ -50,8 +51,8 @@ function TabBarCourse() {
   );
   return (
     <TabView
-      style={tw`flex-1`}
-      sceneContainerStyle={tw`flex-1`}
+      style={tw`flex-1 bg-red`}
+      sceneContainerStyle={tw`flex-1 bg-blue`}
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={setIndex}
