@@ -1,5 +1,12 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
-import { collection, doc, query, setDoc, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import React from 'react';
 import { useCallback } from 'react';
 import { useRef } from 'react';
@@ -41,7 +48,7 @@ function DetailLesson({ navigation, route }) {
     lessonNextRef,
   );
   const completedVideo = useCallback(() => {
-    videoRef?.current?.getCurrentTime()?.then(currentTime => {
+    videoRef?.current?.getCurrentTime()?.then(async currentTime => {
       if (currentTime > data?.time * 60 * 0.7) {
         setDoc(
           doc(
@@ -55,19 +62,28 @@ function DetailLesson({ navigation, route }) {
           { merge: true },
         );
         if (!lessonsNext?.empty) {
-          setDoc(
-            doc(
-              db,
-              'mylesson',
-              user?.userId?.toString() +
-                lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
-            ),
-            {
-              userId: user?.userId,
-              lessonId: lessonsNext?.docs[0]?.data()?.lessonId,
-              status: 0,
-            },
+          const docRef = doc(
+            db,
+            'mylesson',
+            user?.userId?.toString() +
+              lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
           );
+          const docSnap = await getDoc(docRef);
+          if (!docSnap.exists()) {
+            setDoc(
+              doc(
+                db,
+                'mylesson',
+                user?.userId?.toString() +
+                  lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
+              ),
+              {
+                userId: user?.userId,
+                lessonId: lessonsNext?.docs[0]?.data()?.lessonId,
+                status: 0,
+              },
+            );
+          }
         } else {
           setDoc(
             doc(
@@ -93,27 +109,23 @@ function DetailLesson({ navigation, route }) {
     lessonsNext?.empty,
     data?.courseId,
   ]);
-  const onStateChange = useCallback(
-    state => {
-      switch (state) {
-        case 'ended':
-          completedVideo();
-          setPlaying(false);
-          break;
-        case 'playing':
-          setPlaying(true);
-          break;
-        case 'paused':
-          completedVideo();
-          setPlaying(false);
-          break;
-        default:
-          // setPlaying(false);
-          break;
-      }
-    },
-    [completedVideo],
-  );
+  const onStateChange = useCallback(state => {
+    switch (state) {
+      case 'ended':
+        // completedVideo();
+        setPlaying(false);
+        break;
+      case 'playing':
+        setPlaying(true);
+        break;
+      case 'paused':
+        setPlaying(false);
+        break;
+      default:
+        // setPlaying(false);
+        break;
+    }
+  }, []);
   const togglePlaying = useCallback(() => {
     setPlaying(prev => !prev);
   }, []);
@@ -123,7 +135,6 @@ function DetailLesson({ navigation, route }) {
   const continueVideo = () => {
     setPlaying(true);
   };
-  // videoRef?.current?.getCurrentTime()?.then(time => console.log(time));
   if (isLoading) {
     return <MyLoadingFull text={'Đang tải dữ liệu'} />;
   } else {
@@ -148,6 +159,7 @@ function DetailLesson({ navigation, route }) {
             Bài {data?.index}: {data.lessonName}
           </Text>
           <MyTabBar
+            lessonId={data?.lessonId}
             videoRef={videoRef}
             pause={pauseVideo}
             resume={continueVideo}

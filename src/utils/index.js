@@ -38,3 +38,11 @@ export const convertMintoHrs = mins => {
   let rminutes = Math.round(minutes);
   return mins > 60 ? rhours + ' hrs ' + rminutes + ' mins' : rminutes + ' mins';
 };
+export const convertSecondtoMin = second => {
+  let num = second;
+  let mins = num / 60;
+  let rmins = Math.floor(mins);
+  let seconds = (mins - rmins) * 60;
+  let rseconds = Math.round(seconds);
+  return rmins + ':' + rseconds;
+};

@@ -23,7 +23,8 @@ function SceneCourse({ categoryId }) {
   } else {
     return (
       <ScrollView
-        style={tw`flex-1 bg-blue`}
+        style={tw`flex-1`}
+        contentContainerStyle={tw`pb-2`}
         showsVerticalScrollIndicator={false}>
         {data?.docs?.map((item, i) => (
           <ItemCourse key={i} courseId={item?.data()?.courseID} />

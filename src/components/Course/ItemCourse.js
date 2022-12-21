@@ -17,6 +17,7 @@ import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 import BottomModal from '~/modals/BottomModal';
 import { formatNumber } from '~/utils';
+import MyImage from '../MyImage';
 import CategoryCourse from './CategoryCourse';
 
 function ItemCourse({ courseId, canPress = true }) {
@@ -103,9 +104,9 @@ function ItemCourse({ courseId, canPress = true }) {
         disabled={!canPress}
         onPress={() => onPress()}
         style={tw`flex-row mx-5 bg-${theme.bgInput} p-5 rounded-3xl shadow-lg mt-5`}>
-        <Image
+        <MyImage
           style={tw`w-30 h-30 rounded-xl`}
-          source={{ uri: course?.data()?.image }}
+          src={{ uri: course?.data()?.image }}
         />
         <View style={tw`ml-5 flex-1`}>
           <View style={tw`flex-row  justify-between items-center`}>

@@ -4,6 +4,7 @@ import { collection, limit, query } from 'firebase/firestore';
 import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
+import MyImage from '~/components/MyImage';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
@@ -24,8 +25,8 @@ function TopMentor() {
   } else {
     return (
       <View>
-        <View style={tw`flex-row items-center justify-between px-5 mb-5`}>
-          <Text style={tw`font-qs-bold text-${theme.text} text-lg`}>
+        <View style={tw`flex-row items-center justify-between px-5 mb-1`}>
+          <Text style={tw`font-qs-bold text-${theme.text} text-base`}>
             Giáo viên nổi bật
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('AllMentor')}>
@@ -39,11 +40,11 @@ function TopMentor() {
                 onPress={() => goToDetailMentor(item.data()?.mentorID)}
                 style={tw`items-center ml-${i === 0 ? 5 : 0} mr-5`}
                 key={i}>
-                <Image
-                  style={tw`h-16 w-16 rounded-full`}
-                  source={{ uri: item.data().avatar }}
+                <MyImage
+                  style={tw`h-12 w-12 rounded-full`}
+                  src={{ uri: item.data().avatar }}
                 />
-                <Text style={tw`mt-2 font-qs-bold text-${theme.text}`}>
+                <Text style={tw`mt-1 font-qs-bold text-${theme.text}`}>
                   {item.data().mentorName}
                 </Text>
               </TouchableOpacity>

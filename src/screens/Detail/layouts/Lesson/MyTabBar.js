@@ -8,7 +8,7 @@ import tw from '~/libs/tailwind';
 import Comment from './Comment';
 import Note from './Note';
 
-function MyTabBar({ videoRef, pause, resume }) {
+function MyTabBar({ id, videoRef, pause, resume }) {
   const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -21,6 +21,7 @@ function MyTabBar({ videoRef, pause, resume }) {
         return (
           <Note
             jumpTo={jumpTo}
+            lessonId={id}
             videoRef={videoRef}
             pause={pause}
             resume={resume}
