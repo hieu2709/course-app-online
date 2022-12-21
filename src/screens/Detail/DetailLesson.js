@@ -159,7 +159,7 @@ function DetailLesson({ navigation, route }) {
             Bài {data?.index}: {data.lessonName}
           </Text>
           <MyTabBar
-            lessonId={data?.lessonId}
+            id={data?.lessonId}
             videoRef={videoRef}
             pause={pauseVideo}
             resume={continueVideo}

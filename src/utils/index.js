@@ -44,5 +44,15 @@ export const convertSecondtoMin = second => {
   let rmins = Math.floor(mins);
   let seconds = (mins - rmins) * 60;
   let rseconds = Math.round(seconds);
-  return rmins + ':' + rseconds;
+  let rsec = rseconds > 10 ? rseconds : '0' + rseconds;
+  return rseconds > 10 ? rmins + ':' + rsec : '00:' + rsec;
+};
+export const convertSecondtoHours = second => {
+  if (second > 3600) {
+    const result = new Date(second * 1000).toISOString().slice(11, 19);
+    return result;
+  } else {
+    const result = new Date(second * 1000).toISOString().slice(14, 19);
+    return result;
+  }
 };

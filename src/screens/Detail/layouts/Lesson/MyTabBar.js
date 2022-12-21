@@ -1,5 +1,4 @@
 import React from 'react';
-import { forwardRef } from 'react';
 import { useState } from 'react';
 import { Text } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
@@ -28,7 +27,15 @@ function MyTabBar({ id, videoRef, pause, resume }) {
           />
         );
       case 'comment':
-        return <Comment jumpTo={jumpTo} />;
+        return (
+          <Comment
+            jumpTo={jumpTo}
+            lessonId={id}
+            videoRef={videoRef}
+            pause={pause}
+            resume={resume}
+          />
+        );
 
       default:
         return null;
