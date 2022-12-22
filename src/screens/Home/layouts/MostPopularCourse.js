@@ -21,6 +21,7 @@ function MostPopularCourse({ style }) {
       </View>
       <View style={tw`flex-1`}>
         <TabBarCourse />
+        {/* <MyTabBar /> */}
       </View>
     </View>
   );

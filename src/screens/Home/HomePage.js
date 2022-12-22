@@ -15,7 +15,7 @@ function HomePage({ navigation }) {
   const { user } = useUser();
   return (
     <Container>
-      <View style={[tw`flex-1`]}>
+      <View style={tw`flex-1`}>
         <View>
           <View style={tw`flex-row justify-between items-center px-5 py-5`}>
             <View style={tw`flex-row items-center`}>
@@ -63,14 +63,9 @@ function HomePage({ navigation }) {
               Tìm kiếm...
             </Text>
           </TouchableOpacity>
+          <TopMentor />
         </View>
-
-        <View style={tw`flex-1 pt-5`}>
-          <View style={tw`flex-1`}>
-            <TopMentor />
-            <MostPopularCourse style={tw`mt-5`} />
-          </View>
-        </View>
+        <MostPopularCourse style={tw`flex-1 mt-5`} />
       </View>
     </Container>
   );

@@ -52,7 +52,7 @@ function TabBarCourse() {
   return (
     <TabView
       style={tw`flex-1 bg-red`}
-      sceneContainerStyle={tw`flex-1 bg-blue`}
+      sceneContainerStyle={tw`flex-1 bg-blue pb-1`}
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={setIndex}

@@ -23,7 +23,7 @@ function TopMentor() {
     return <MyLoading text={'Đang tải...'} />;
   } else {
     return (
-      <View>
+      <View style={tw`mt-5`}>
         <View style={tw`flex-row items-center justify-between px-5 mb-5`}>
           <Text style={tw`font-qs-bold text-${theme.text} text-lg`}>
             Giáo viên nổi bật
@@ -39,10 +39,10 @@ function TopMentor() {
                 onPress={() => goToDetailMentor(item.data()?.mentorID)}
                 style={tw`items-center ml-${i === 0 ? 5 : 0} mr-5`}
                 key={i}>
-                <Image
+                {/* <Image
                   style={tw`h-16 w-16 rounded-full`}
                   source={{ uri: item.data().avatar }}
-                />
+                /> */}
                 <Text style={tw`mt-2 font-qs-bold text-${theme.text}`}>
                   {item.data().mentorName}
                 </Text>
@@ -50,6 +50,7 @@ function TopMentor() {
             );
           })}
         </ScrollView>
+        {/* <View style={tw`h-25`} /> */}
       </View>
     );
   }
