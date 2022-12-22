@@ -1,9 +1,13 @@
 import React from 'react';
-import { TabView, TabBar } from 'react-native-tab-view';
+import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
 import { useState } from 'react';
 import { Text, useWindowDimensions, View } from 'react-native';
 import tw from '~/libs/tailwind';
 import SceneCourse from './SceneCourse';
+import { collection } from 'firebase/firestore';
+import { db } from '~/firebase/config';
+import { useFirestoreQuery } from '@react-query-firebase/firestore';
+import MyLoading from '~/base/components/MyLoading';
 
 function TabBarCourse() {
   const layout = useWindowDimensions();
@@ -12,19 +16,18 @@ function TabBarCourse() {
     { key: 'all', title: 'All' },
     { key: 'design3d', title: '3D Design' },
     { key: 'bussiness', title: 'Kinh doanh' },
-    // { key: 'programming', title: 'Programming' },
+    { key: 'programming', title: 'Lập trình' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
       case 'all':
         return <SceneCourse jumpTo={jumpTo} />;
-      // return <View style={tw`flex-1 bg-green`} />;
       case 'design3d':
         return <SceneCourse jumpTo={jumpTo} categoryId={1} />;
       case 'bussiness':
         return <SceneCourse jumpTo={jumpTo} categoryId={2} />;
-      // case 'programming':
-      //   return <SceneCourse jumpTo={jumpTo} />;
+      case 'programming':
+        return <SceneCourse jumpTo={jumpTo} categoryId={3} />;
 
       default:
         return null;
@@ -49,10 +52,11 @@ function TabBarCourse() {
       )}
     />
   );
+
   return (
     <TabView
-      style={tw`flex-1 bg-red`}
-      sceneContainerStyle={tw`flex-1 bg-blue pb-1`}
+      style={tw`flex-1 `}
+      sceneContainerStyle={tw`flex-1`}
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={setIndex}

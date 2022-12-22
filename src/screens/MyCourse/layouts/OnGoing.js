@@ -9,7 +9,6 @@ import {
 import React from 'react';
 import { FlatList, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
-import MyLoadingFull from '~/base/components/MyLoadingFull';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
@@ -27,14 +26,18 @@ function OnGoing() {
     limit(5),
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
-    useFirestoreInfiniteQuery('my-course-ongoing-infinite', Query, snapshot => {
-      const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-      if (!lastDocument) {
-        return;
-      } else {
-        return query(Query, startAfter(lastDocument));
-      }
-    });
+    useFirestoreInfiniteQuery(
+      ['my-course-ongoing-infinite', user?.userId || ''],
+      Query,
+      snapshot => {
+        const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+        if (!lastDocument) {
+          return;
+        } else {
+          return query(Query, startAfter(lastDocument));
+        }
+      },
+    );
 
   const list = () => {
     let paginatedData = [];
@@ -59,13 +62,12 @@ function OnGoing() {
     }
   };
   const renderItem = item => {
-    // console.log(item);
     return (
       <View
         style={tw`bg-${
           item?.index % 2 === 0 ? theme.bg : theme.bgInput
-        } mx-5 my-1 py-2  justify-center rounded`}>
-        <Courses userId={item?.item?.userId} courseId={item?.item?.courseId} />
+        } mx-2 my-1 py-2  justify-center rounded`}>
+        <Courses courseId={item?.item?.courseId} />
       </View>
     );
   };

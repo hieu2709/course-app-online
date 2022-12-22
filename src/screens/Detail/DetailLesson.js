@@ -1,27 +1,27 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
-import { collection, doc, query, setDoc, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import React from 'react';
 import { useCallback } from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
-import ButtonBack from '~/components/ButtonBack';
-import MyButton from '~/components/MyButton';
+import Icon from '~/base/Icon';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
+import ModalCenter from '~/modals/ModalCenter';
+import ModalReview from './components/ModalReview';
 import MyTabBar from './layouts/Lesson/MyTabBar';
 
 function DetailLesson({ navigation, route }) {
@@ -31,6 +31,7 @@ function DetailLesson({ navigation, route }) {
   const [playing, setPlaying] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const videoRef = useRef();
+  const modalRef = useRef();
   const lessonNextRef = query(
     collection(db, 'lessons'),
     where('courseId', '==', data?.courseId),
@@ -41,7 +42,7 @@ function DetailLesson({ navigation, route }) {
     lessonNextRef,
   );
   const completedVideo = useCallback(() => {
-    videoRef?.current?.getCurrentTime()?.then(currentTime => {
+    videoRef?.current?.getCurrentTime()?.then(async currentTime => {
       if (currentTime > data?.time * 60 * 0.7) {
         setDoc(
           doc(
@@ -55,19 +56,29 @@ function DetailLesson({ navigation, route }) {
           { merge: true },
         );
         if (!lessonsNext?.empty) {
-          setDoc(
-            doc(
-              db,
-              'mylesson',
-              user?.userId?.toString() +
-                lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
-            ),
-            {
-              userId: user?.userId,
-              lessonId: lessonsNext?.docs[0]?.data()?.lessonId,
-              status: 0,
-            },
+          const docRef = doc(
+            db,
+            'mylesson',
+            user?.userId?.toString() +
+              lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
           );
+          const docSnap = await getDoc(docRef);
+          if (!docSnap.exists()) {
+            setDoc(
+              doc(
+                db,
+                'mylesson',
+                user?.userId?.toString() +
+                  lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
+              ),
+              {
+                userId: user?.userId,
+                lessonId: lessonsNext?.docs[0]?.data()?.lessonId,
+                status: 0,
+              },
+            );
+          }
+          navigation.goBack();
         } else {
           setDoc(
             doc(
@@ -80,8 +91,20 @@ function DetailLesson({ navigation, route }) {
             },
             { merge: true },
           );
+          const myreviewRef = doc(
+            collection(db, 'myreview'),
+            user?.userId?.toString() + data?.courseId?.toString(),
+          );
+          const docSnap = await getDoc(myreviewRef);
+          if (docSnap.exists()) {
+            navigation.goBack();
+          } else {
+            setPlaying(false);
+            modalRef?.current?.openModal();
+          }
         }
       } else {
+        navigation?.goBack();
         return;
       }
     });
@@ -92,28 +115,25 @@ function DetailLesson({ navigation, route }) {
     lessonsNext?.docs,
     lessonsNext?.empty,
     data?.courseId,
+    navigation,
   ]);
-  const onStateChange = useCallback(
-    state => {
-      switch (state) {
-        case 'ended':
-          completedVideo();
-          setPlaying(false);
-          break;
-        case 'playing':
-          setPlaying(true);
-          break;
-        case 'paused':
-          completedVideo();
-          setPlaying(false);
-          break;
-        default:
-          // setPlaying(false);
-          break;
-      }
-    },
-    [completedVideo],
-  );
+  const onStateChange = useCallback(state => {
+    switch (state) {
+      case 'ended':
+        // completedVideo();
+        setPlaying(false);
+        break;
+      case 'playing':
+        setPlaying(true);
+        break;
+      case 'paused':
+        setPlaying(false);
+        break;
+      default:
+        // setPlaying(false);
+        break;
+    }
+  }, []);
   const togglePlaying = useCallback(() => {
     setPlaying(prev => !prev);
   }, []);
@@ -123,18 +143,40 @@ function DetailLesson({ navigation, route }) {
   const continueVideo = () => {
     setPlaying(true);
   };
-  // videoRef?.current?.getCurrentTime()?.then(time => console.log(time));
+
+  const closeModal = () => {
+    modalRef?.current?.closeModal();
+    navigation.goBack();
+  };
   if (isLoading) {
     return <MyLoadingFull text={'Đang tải dữ liệu'} />;
   } else {
     return (
       <Container>
+        <ModalCenter touchDisable={true} ref={modalRef}>
+          <ModalReview close={closeModal} courseId={data?.courseId} />
+        </ModalCenter>
         <View style={tw`flex-1 `}>
-          <ButtonBack
-            style={tw`py-2 ml-5`}
-            title={`Bài ${data?.index}`}
-            onPress={completedVideo}
-          />
+          <View style={tw`py-2 ml-5`}>
+            <TouchableOpacity
+              style={tw`flex-row items-center`}
+              onPress={() => {
+                completedVideo();
+              }}>
+              <View style={tw`pr-4`}>
+                <Icon
+                  type="Ionicons"
+                  name="arrow-back-sharp"
+                  size={26}
+                  color={tw.color(`${theme.text}`)}
+                />
+              </View>
+              <Text style={tw`font-qs-bold  text-xl text-${theme.text} `}>
+                {`Bài ${data?.index}`}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <YoutubePlayer
             ref={videoRef}
             onReady={() => setIsReady(true)}
@@ -148,6 +190,7 @@ function DetailLesson({ navigation, route }) {
             Bài {data?.index}: {data.lessonName}
           </Text>
           <MyTabBar
+            id={data?.lessonId}
             videoRef={videoRef}
             pause={pauseVideo}
             resume={continueVideo}

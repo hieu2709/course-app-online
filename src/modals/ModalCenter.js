@@ -1,12 +1,6 @@
-import React, {
-  Children,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-} from 'react';
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useState } from 'react';
-import { Animated, Modal, TouchableOpacity, View } from 'react-native';
-import Icon from '~/base/Icon';
+import { Animated, Modal, TouchableOpacity } from 'react-native';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 

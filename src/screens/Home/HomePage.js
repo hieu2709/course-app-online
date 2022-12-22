@@ -17,11 +17,11 @@ function HomePage({ navigation }) {
     <Container>
       <View style={tw`flex-1`}>
         <View>
-          <View style={tw`flex-row justify-between items-center px-5 py-5`}>
+          <View style={tw`flex-row justify-between items-center px-5 py-5 `}>
             <View style={tw`flex-row items-center`}>
               <Image
                 source={require('~/assets/noavatar.png')}
-                style={tw`w-15 h-15 rounded-full`}
+                style={tw`w-14 h-14 rounded-full`}
               />
               <View style={tw`ml-4`}>
                 <View style={tw`flex-row`}>
@@ -63,7 +63,13 @@ function HomePage({ navigation }) {
               Tìm kiếm...
             </Text>
           </TouchableOpacity>
+        </View>
+
+        <View style={tw`flex-1 mt-5`}>
           <TopMentor />
+          <View style={tw`flex-1`}>
+            <MostPopularCourse style={tw`mt-3`} />
+          </View>
         </View>
         <MostPopularCourse style={tw`flex-1 mt-5`} />
       </View>

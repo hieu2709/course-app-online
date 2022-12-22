@@ -10,8 +10,7 @@ import CategoryCourse from '~/components/Course/CategoryCourse';
 
 function Header({ handleBookmark, isBookmark }) {
   const { theme } = useTheme();
-  const { course, totalTime, countStudent } = useCourse();
-
+  const { course, totalTime, countStudent, review, rate } = useCourse();
   return (
     <View>
       <View style={tw`flex-row justify-between items-start mx-5 mt-5`}>
@@ -42,14 +41,21 @@ function Header({ handleBookmark, isBookmark }) {
       <View style={tw`flex-row mx-5 my-3`}>
         <CategoryCourse categoryId={course?.categoryId} />
         <View style={tw`flex-row items-center ml-5`}>
-          <Icon
-            type="AntDesign"
-            name="star"
-            size={18}
-            color={tw.color('yellow')}
-          />
-          <Text style={tw`font-qs-medium ml-2 text-${theme.text}`}>
-            {course.rate} ({formatNumber(4390)} đánh giá)
+          {rate && (
+            <Text style={tw`font-qs-bold text-base mr-1 text-yellow`}>
+              {rate || 0}
+            </Text>
+          )}
+          {rate && (
+            <Icon
+              type="AntDesign"
+              name="star"
+              size={18}
+              color={tw.color('yellow')}
+            />
+          )}
+          <Text style={tw`font-qs-medium ml-2 text-${theme.text} text-base`}>
+            ({formatNumber(review)} đánh giá)
           </Text>
         </View>
       </View>

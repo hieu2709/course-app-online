@@ -38,3 +38,21 @@ export const convertMintoHrs = mins => {
   let rminutes = Math.round(minutes);
   return mins > 60 ? rhours + ' hrs ' + rminutes + ' mins' : rminutes + ' mins';
 };
+export const convertSecondtoMin = second => {
+  let num = second;
+  let mins = num / 60;
+  let rmins = Math.floor(mins);
+  let seconds = (mins - rmins) * 60;
+  let rseconds = Math.round(seconds);
+  let rsec = rseconds > 10 ? rseconds : '0' + rseconds;
+  return rseconds > 10 ? rmins + ':' + rsec : '00:' + rsec;
+};
+export const convertSecondtoHours = second => {
+  if (second > 3600) {
+    const result = new Date(second * 1000).toISOString().slice(11, 19);
+    return result;
+  } else {
+    const result = new Date(second * 1000).toISOString().slice(14, 19);
+    return result;
+  }
+};

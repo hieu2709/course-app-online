@@ -10,8 +10,8 @@ function MostPopularCourse({ style }) {
   const navigation = useNavigation();
   return (
     <View style={[tw`flex-1`, style]}>
-      <View style={tw`flex-row items-center justify-between px-5 mb-5`}>
-        <Text style={tw`font-qs-bold text-${theme.text} text-lg`}>
+      <View style={tw`flex-row items-center justify-between px-5 mb-1`}>
+        <Text style={tw`font-qs-bold text-${theme.text} text-base`}>
           Khóa học phổ biến
         </Text>
         <TouchableOpacity

@@ -1,3 +1,4 @@
+import { async } from '@firebase/util';
 import { useNavigation } from '@react-navigation/native';
 import {
   useFirestoreDocument,
@@ -8,6 +9,7 @@ import {
   doc,
   getCountFromServer,
   getDocs,
+  onSnapshot,
   query,
   where,
 } from 'firebase/firestore';
@@ -22,10 +24,11 @@ import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 import { convertMintoHrs } from '~/utils';
 
-function Courses({ userId, courseId }) {
+function Courses({ courseId }) {
   const { theme } = useTheme();
   const { user } = useUser();
   const navigation = useNavigation();
+  const [lessonsCompleted, setLessonsCompleted] = useState(0);
 
   const courseRef = doc(collection(db, 'courses'), courseId?.toString());
   const { data: course, isLoading: isLoadingCourse } = useFirestoreDocument(
@@ -41,21 +44,33 @@ function Courses({ userId, courseId }) {
     lessonsRef,
     { subscribe: true },
   );
-  const lessonsCompletedRef = query(
-    collection(db, 'mylesson'),
-    where('status', '==', 1),
-    where('userId', '==', user?.userId),
-  );
-  const { data: lessonsCompleted, isLoading: isLoadingLessonCompleted } =
-    useFirestoreQuery(['lessons-completed', courseId], lessonsCompletedRef, {
-      subscribe: true,
+
+  useEffect(() => {
+    const listLessonId = lessons?.docs?.map(d => {
+      return d?.data()?.lessonId;
     });
+    const getListLessonCompleted = async () => {
+      const ref = query(
+        collection(db, 'mylesson'),
+        where('lessonId', 'in', listLessonId),
+        where('userId', '==', user?.userId),
+        where('status', '==', 1),
+      );
+      onSnapshot(ref, s => {
+        setLessonsCompleted(s?.docs?.length);
+      });
+      // setLessonsCompleted(snapshot?.docs?.length);
+    };
+    if (listLessonId) {
+      getListLessonCompleted();
+    }
+  }, [lessons?.docs, user?.userId]);
   const totalTime = lessons?.docs?.reduce((total, current) => {
     return total + current?.data()?.time;
   }, 0);
 
   const percent = (
-    ((lessonsCompleted?.docs?.length || 0) / (lessons?.docs?.length || 1)) *
+    ((lessonsCompleted || 0) / (lessons?.docs?.length || 1)) *
     100
   ).toFixed(0);
   const color = () => {
@@ -76,8 +91,7 @@ function Courses({ userId, courseId }) {
       data: item,
     });
   };
-  // console.log(data?.data());
-  if (isLoadingCourse || isLoadingLesson || isLoadingLessonCompleted) {
+  if (isLoadingCourse || isLoadingLesson) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
     return (
@@ -105,8 +119,7 @@ function Courses({ userId, courseId }) {
             </View>
             <Text
               style={tw`w-16 ml-2 font-qs-medium text-right text-${theme.text}`}>
-              {lessonsCompleted?.docs?.length || 0} /{' '}
-              {lessons?.docs?.length || 0}
+              {lessonsCompleted || 0} / {lessons?.docs?.length || 0}
             </Text>
           </View>
         </View>

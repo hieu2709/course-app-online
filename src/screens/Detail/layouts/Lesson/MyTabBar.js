@@ -1,5 +1,4 @@
 import React from 'react';
-import { forwardRef } from 'react';
 import { useState } from 'react';
 import { Text } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
@@ -8,7 +7,7 @@ import tw from '~/libs/tailwind';
 import Comment from './Comment';
 import Note from './Note';
 
-function MyTabBar({ videoRef, pause, resume }) {
+function MyTabBar({ id, videoRef, pause, resume }) {
   const { theme } = useTheme();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -21,13 +20,22 @@ function MyTabBar({ videoRef, pause, resume }) {
         return (
           <Note
             jumpTo={jumpTo}
+            lessonId={id}
             videoRef={videoRef}
             pause={pause}
             resume={resume}
           />
         );
       case 'comment':
-        return <Comment jumpTo={jumpTo} />;
+        return (
+          <Comment
+            jumpTo={jumpTo}
+            lessonId={id}
+            videoRef={videoRef}
+            pause={pause}
+            resume={resume}
+          />
+        );
 
       default:
         return null;

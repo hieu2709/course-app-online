@@ -28,7 +28,7 @@ function Completed() {
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
     useFirestoreInfiniteQuery(
-      'my-course-completed-infinite',
+      ['my-course-completed-infinite', user?.userId || ''],
       Query,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];
@@ -68,8 +68,8 @@ function Completed() {
       <View
         style={tw`bg-${
           item?.index % 2 === 0 ? theme.bg : theme.bgInput
-        } mx-5 my-1 py-2  justify-center rounded`}>
-        <Courses userId={item?.item?.userId} courseId={item?.item?.courseId} />
+        } mx-2 my-1 py-2  justify-center rounded`}>
+        <Courses courseId={item?.item?.courseId} />
       </View>
     );
   };
