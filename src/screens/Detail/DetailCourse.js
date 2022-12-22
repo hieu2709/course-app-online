@@ -8,7 +8,6 @@ import tw from '~/libs/tailwind';
 import BottomModal from '~/modals/BottomModal';
 import ItemCourse from '../../components/Course/ItemCourse';
 import MyTabBar from './layouts/Course/MyTabBar';
-
 import Header from './layouts/Course/Header';
 import ButtonEnrolCourse from '~/components/ButtonEnrollCourse';
 import { CourseProvider } from '~/provider/CourseProvider';
@@ -16,17 +15,13 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   query,
   setDoc,
   where,
 } from 'firebase/firestore';
-import { useEffect } from 'react';
 import { db } from '~/firebase/config';
-import { useState } from 'react';
 import useUser from '~/hooks/useUser';
 import {
-  useFirestoreCollectionMutation,
   useFirestoreDocument,
   useFirestoreDocumentMutation,
   useFirestoreQuery,
@@ -47,26 +42,37 @@ function DetailCourse({ navigation, route }) {
     collection(db, 'lessons'),
     where('courseId', '==', data?.courseID),
   );
-
   const { data: lessons, isLoading: isLoadingLessons } = useFirestoreQuery(
     ['lessons', data?.courseID],
     lessonsRef,
     { subscribe: true },
   );
+  const reviewRef = query(
+    collection(db, 'myreview'),
+    where('courseId', '==', data?.courseID),
+  );
+  const { data: reviews, isLoading: isLoadingReview } = useFirestoreQuery(
+    ['review', data?.courseID],
+    reviewRef,
+    { subscribe: true },
+  );
+  const avgRate =
+    reviews?.docs?.reduce((total, current) => {
+      return total + current?.data()?.rate;
+    }, 0) / reviews?.docs?.length || false;
   const myCourseRef = query(
     collection(db, 'mycourse'),
-    where('userId', '==', user?.userId),
+    where('courseId', '==', data?.courseID),
     where('status', '!=', 0),
   );
   const { data: listMyCourse, isLoading: isLoadingListMyCourse } =
     useFirestoreQuery(['mycourse-enroll', data?.courseID], myCourseRef, {
       subscribe: true,
     });
+
   const totalTime = lessons?.docs?.reduce((total, current) => {
     return total + current?.data()?.time;
   }, 0);
-  // lessons?.docs?.map(d => console.log(d.data()));
-
   const docRef = doc(
     db,
     'mycourse',
@@ -88,6 +94,7 @@ function DetailCourse({ navigation, route }) {
   const { data: lessonsFirst } = useFirestoreQuery(
     ['lessonFirst', data.courseID],
     lessonFirstRef,
+    // { subscribe: true },
   );
   // console.log(lessonsFirst?.docs[0]?.data());
   const mutationCourse = useFirestoreDocumentMutation(
@@ -196,16 +203,23 @@ function DetailCourse({ navigation, route }) {
       },
     );
   };
-  if (isLoadingListMyCourse || isLoadingMyCourse || isLoadingLessons) {
+  if (
+    isLoadingListMyCourse ||
+    isLoadingMyCourse ||
+    isLoadingLessons ||
+    isLoadingReview
+  ) {
     return <MyLoadingFull text={'Đang tải dữ liệu...'} />;
   } else {
     return (
       <Container>
         <CourseProvider
           course={data}
+          rate={avgRate}
           countLesson={lessons?.docs?.length}
           totalTime={totalTime}
-          countStudent={listMyCourse?.docs?.length}>
+          countStudent={listMyCourse?.docs?.length}
+          review={reviews?.docs?.length}>
           <View style={tw`flex-1`}>
             <View style={tw`flex-1`}>
               <View style={[tw`flex-1`]}>

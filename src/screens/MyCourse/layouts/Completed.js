@@ -28,7 +28,7 @@ function Completed() {
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
     useFirestoreInfiniteQuery(
-      'my-course-completed-infinite',
+      ['my-course-completed-infinite', user?.userId || ''],
       Query,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];

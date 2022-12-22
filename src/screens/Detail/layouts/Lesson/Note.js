@@ -84,21 +84,22 @@ function Note({ lessonId, videoRef, pause, resume }) {
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps="handled"
         style={tw`flex-1`}
+        horizontal={true}
         contentContainerStyle={tw`flex-1`}
         extraScrollHeight={10}>
         <View style={tw`flex-1`}>
           <MyToast ref={toastRef} />
           <ScrollView
             style={tw`flex-1 mb-2`}
-            contentContainerStyle={tw`mx-5 pt-2 pb-5`}>
+            contentContainerStyle={tw`mx-5 pt-2  pb-5`}>
             {myLesson?.data()?.notes?.map((n, i) => (
-              <View key={i} style={tw`flex-row `}>
+              <View key={i} style={tw`flex-row`}>
                 <TouchableOpacity onPress={() => seekToTime(n?.time)}>
                   <Text style={tw`font-qs-semibold text-base text-blue`}>
                     {convertSecondtoHours(n?.time)}
                   </Text>
                 </TouchableOpacity>
-                <Text style={tw`font-qs-regular text-base text-${theme.text}`}>
+                <Text style={tw`font-qs-medium text-base text-${theme.text}`}>
                   {' '}
                   :{' '}
                 </Text>

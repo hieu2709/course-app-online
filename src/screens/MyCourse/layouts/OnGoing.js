@@ -26,14 +26,18 @@ function OnGoing() {
     limit(5),
   );
   const { data, isLoading, hasNextPage, fetchNextPage } =
-    useFirestoreInfiniteQuery('my-course-ongoing-infinite', Query, snapshot => {
-      const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-      if (!lastDocument) {
-        return;
-      } else {
-        return query(Query, startAfter(lastDocument));
-      }
-    });
+    useFirestoreInfiniteQuery(
+      ['my-course-ongoing-infinite', user?.userId || ''],
+      Query,
+      snapshot => {
+        const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+        if (!lastDocument) {
+          return;
+        } else {
+          return query(Query, startAfter(lastDocument));
+        }
+      },
+    );
 
   const list = () => {
     let paginatedData = [];

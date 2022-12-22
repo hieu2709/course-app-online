@@ -37,7 +37,7 @@ function ItemCourse({ courseId, canPress = true }) {
   );
   const myCourseRef = query(
     collection(db, 'mycourse'),
-    where('userId', '==', user?.userId),
+    // where('userId', '==', user?.userId || ''),
     where('courseId', '==', courseId),
     where('status', '!=', 0),
   );

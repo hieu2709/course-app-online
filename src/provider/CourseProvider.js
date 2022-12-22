@@ -7,10 +7,12 @@ function CourseProvider({
   countLesson,
   totalTime,
   countStudent,
+  review,
+  rate,
 }) {
   return (
     <CourseContext.Provider
-      value={{ course, countLesson, totalTime, countStudent }}>
+      value={{ course, countLesson, totalTime, countStudent, review, rate }}>
       {children}
     </CourseContext.Provider>
   );
