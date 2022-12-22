@@ -11,6 +11,15 @@ import CategoryCourse from '~/components/Course/CategoryCourse';
 function Header({ handleBookmark, isBookmark }) {
   const { theme } = useTheme();
   const { course, totalTime, countStudent, review, rate } = useCourse();
+  const getColor = () => {
+    if (rate > 4) {
+      return 'yellow';
+    } else if (rate > 3) {
+      return 'green';
+    } else {
+      return 'red';
+    }
+  };
   return (
     <View>
       <View style={tw`flex-row justify-between items-start mx-5 mt-5`}>
@@ -41,19 +50,22 @@ function Header({ handleBookmark, isBookmark }) {
       <View style={tw`flex-row mx-5 my-3`}>
         <CategoryCourse categoryId={course?.categoryId} />
         <View style={tw`flex-row items-center ml-5`}>
-          {rate && (
-            <Text style={tw`font-qs-bold text-base mr-1 text-yellow`}>
-              {rate || 0}
-            </Text>
-          )}
-          {rate && (
-            <Icon
-              type="AntDesign"
-              name="star"
-              size={18}
-              color={tw.color('yellow')}
-            />
-          )}
+          <View
+            style={tw`flex-row items-center bg-${getColor()} px-2 rounded-full`}>
+            {rate && (
+              <Text style={tw`font-qs-bold text-base mr-1 text-white`}>
+                {rate?.toFixed(1) || 0}
+              </Text>
+            )}
+            {rate && (
+              <Icon
+                type="AntDesign"
+                name="star"
+                size={18}
+                color={tw.color('white')}
+              />
+            )}
+          </View>
           <Text style={tw`font-qs-medium ml-2 text-${theme.text} text-base`}>
             ({formatNumber(review)} đánh giá)
           </Text>

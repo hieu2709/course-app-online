@@ -4,7 +4,6 @@ import { useRef } from 'react';
 
 export function useRefreshOnFocus(refetch, enabled = true) {
   const enabledRef = useRef(false);
-
   useFocusEffect(
     useCallback(() => {
       if (enabledRef.current && enabled) {
@@ -12,7 +11,6 @@ export function useRefreshOnFocus(refetch, enabled = true) {
       } else {
         enabledRef.current = true;
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [enabled]),
+    }, [enabled, refetch]),
   );
 }

@@ -60,6 +60,7 @@ function DetailCourse({ navigation, route }) {
     reviews?.docs?.reduce((total, current) => {
       return total + current?.data()?.rate;
     }, 0) / reviews?.docs?.length || false;
+
   const myCourseRef = query(
     collection(db, 'mycourse'),
     where('courseId', '==', data?.courseID),
@@ -91,12 +92,10 @@ function DetailCourse({ navigation, route }) {
     where('courseId', '==', data?.courseID),
     where('index', '==', 1),
   );
-  const { data: lessonsFirst } = useFirestoreQuery(
-    ['lessonFirst', data.courseID],
-    lessonFirstRef,
-    // { subscribe: true },
-  );
-  // console.log(lessonsFirst?.docs[0]?.data());
+  const { data: lessonsFirst, isLoading: isLoadingLessonFirst } =
+    useFirestoreQuery(['lessonFirst', data.courseID], lessonFirstRef, {
+      subscribe: true,
+    });
   const mutationCourse = useFirestoreDocumentMutation(
     docRef,
     { merge: true },
@@ -207,7 +206,8 @@ function DetailCourse({ navigation, route }) {
     isLoadingListMyCourse ||
     isLoadingMyCourse ||
     isLoadingLessons ||
-    isLoadingReview
+    isLoadingReview ||
+    isLoadingLessonFirst
   ) {
     return <MyLoadingFull text={'Đang tải dữ liệu...'} />;
   } else {

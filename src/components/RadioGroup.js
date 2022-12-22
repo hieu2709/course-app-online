@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
 import tw from '~/libs/tailwind';
-function RadioGroup({ horzital = false, data, show = false }) {
-  const [isSelect, setIsSelect] = useState(0);
-  const handleSelect = item => {};
+function RadioGroup({ horzital = false, data, show = false, onSelect, value }) {
+  const [isSelect, setIsSelect] = useState(value || 0);
+  const handleSelect = (item, i) => {
+    onSelect?.(item, i);
+  };
   return (
     <ScrollView
       showsHorizontalScrollIndicator={show}
@@ -15,7 +17,7 @@ function RadioGroup({ horzital = false, data, show = false }) {
         <TouchableOpacity
           onPress={() => {
             setIsSelect(i);
-            handleSelect(item);
+            handleSelect(item, i);
           }}
           key={i}
           style={tw` border-2 flex-row items-center border-blue mr-3 ml-${

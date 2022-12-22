@@ -15,7 +15,7 @@ import MentorItem from './components/MentorItem';
 function AllMentor() {
   const { theme } = useTheme();
   const collectionRef = collection(db, 'mentors');
-  const mentorQuery = query(collectionRef, limit(2));
+  const mentorQuery = query(collectionRef, limit(10));
   const { data, isLoading, hasNextPage, fetchNextPage } =
     useFirestoreInfiniteQuery('mentors-infinite', mentorQuery, snapshot => {
       const lastDocument = snapshot.docs[snapshot.docs.length - 1];

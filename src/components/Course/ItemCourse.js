@@ -35,6 +35,28 @@ function ItemCourse({ courseId, canPress = true }) {
     ['course', courseId],
     courseRef,
   );
+  const reviewRef = query(
+    collection(db, 'myreview'),
+    where('courseId', '==', courseId),
+  );
+  const { data: reviews, isLoading: isLoadingReview } = useFirestoreQuery(
+    ['review', courseId],
+    reviewRef,
+    { subscribe: true },
+  );
+  const avgRate =
+    reviews?.docs?.reduce((total, current) => {
+      return total + current?.data()?.rate;
+    }, 0) / reviews?.docs?.length || false;
+  const getColor = () => {
+    if (avgRate > 4) {
+      return 'yellow';
+    } else if (avgRate > 3) {
+      return 'green';
+    } else {
+      return 'red';
+    }
+  };
   const myCourseRef = query(
     collection(db, 'mycourse'),
     // where('userId', '==', user?.userId || ''),
@@ -96,7 +118,7 @@ function ItemCourse({ courseId, canPress = true }) {
       });
     }
   };
-  if (isLoading || isLoadingListMyCourse) {
+  if (isLoading || isLoadingListMyCourse || isLoadingReview) {
     return <MyLoading text={'Loading'} />;
   } else {
     return (
@@ -151,16 +173,29 @@ function ItemCourse({ courseId, canPress = true }) {
             </Text>
           )}
           <View style={tw`flex-row items-center mt-1`}>
-            <Icon
-              type="AntDesign"
-              name="star"
-              size={18}
-              color={tw.color('yellow')}
-            />
-            <Text style={tw`font-qs-medium ml-2 text-${theme.text}`}>
-              {course?.data()?.rate} |{' '}
+            <Text style={tw`font-qs-semibold ml-2 text-${theme.text}`}>
               {formatNumber(listMyCourse?.docs?.length)} học sinh
             </Text>
+            {avgRate && (
+              <View style={tw`flex-row items-center `}>
+                <Text style={tw`font-qs-bold ml-1 text-${theme.text}`}>
+                  {' '}
+                  |{' '}
+                </Text>
+                <View
+                  style={tw`flex-row items-center px-2 bg-${getColor()} rounded-full`}>
+                  <Text style={tw`font-qs-bold mr-1 text-base text-white`}>
+                    {avgRate.toFixed(1)}
+                  </Text>
+                  <Icon
+                    type="AntDesign"
+                    name="star"
+                    size={18}
+                    color={tw.color('white')}
+                  />
+                </View>
+              </View>
+            )}
           </View>
         </View>
         <BottomModal ref={modalRef}>

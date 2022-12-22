@@ -1,4 +1,5 @@
-import { collection, doc, setDoc, Timestamp } from 'firebase/firestore';
+import { useFirestoreDocumentMutation } from '@react-query-firebase/firestore';
+import { collection, doc, Timestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
 import {
   Keyboard,
@@ -21,10 +22,21 @@ function ModalReview({ close, courseId }) {
   const [review, setReview] = useState('');
   const { theme } = useTheme();
   const { user } = useUser();
+
   const selectStar = num => {
     setNumStar(num);
     Keyboard.dismiss();
   };
+  const myreviewRef = doc(
+    collection(db, 'myreview'),
+    user?.userId?.toString() + courseId?.toString(),
+  );
+  const mutation = useFirestoreDocumentMutation(
+    myreviewRef,
+    {},
+    {},
+    // { onSettled: refetch },
+  );
   const submitReview = async () => {
     const param = {
       userId: user?.userId,
@@ -33,11 +45,8 @@ function ModalReview({ close, courseId }) {
       review: review,
       dateUpdated: Timestamp.fromDate(new Date()),
     };
-    const myreviewRef = doc(
-      collection(db, 'myreview'),
-      user?.userId?.toString() + courseId?.toString(),
-    );
-    await setDoc(myreviewRef, param);
+
+    mutation.mutate(param);
     close?.();
   };
   return (

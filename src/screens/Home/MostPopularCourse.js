@@ -2,10 +2,11 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import Icon from '~/base/Icon';
-import TabBarCourse from '~/components/Course/TabBarCourse';
+
 import useTheme from '~/hooks/useTheme';
 import Container from '~/layouts/Container';
 import Header from '~/layouts/Header';
+import TabBarAllCourse from './components/TabBarAllCourse';
 
 function MostPopularCourse() {
   const { theme } = useTheme();
@@ -13,7 +14,7 @@ function MostPopularCourse() {
   return (
     <Container>
       <Header
-        title={'Most Popular Courses'}
+        title={'Tất cả khóa học'}
         rightIcon={
           <TouchableOpacity onPress={() => navigation.navigate('Search')}>
             <Icon
@@ -25,7 +26,7 @@ function MostPopularCourse() {
           </TouchableOpacity>
         }
       />
-      <TabBarCourse />
+      <TabBarAllCourse />
     </Container>
   );
 }
