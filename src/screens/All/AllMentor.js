@@ -1,7 +1,7 @@
 import { useFirestoreInfiniteQuery } from '@react-query-firebase/firestore';
 import { collection, limit, query, startAfter } from 'firebase/firestore';
 import React from 'react';
-import { FlatList, TouchableOpacity, View } from 'react-native';
+import { FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 import Icon from '~/base/Icon';
@@ -10,13 +10,14 @@ import useTheme from '~/hooks/useTheme';
 import Container from '~/layouts/Container';
 import Header from '~/layouts/Header';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 import MentorItem from './components/MentorItem';
 
 function AllMentor() {
   const { theme } = useTheme();
   const collectionRef = collection(db, 'mentors');
   const mentorQuery = query(collectionRef, limit(10));
-  const { data, isLoading, hasNextPage, fetchNextPage } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery('mentors-infinite', mentorQuery, snapshot => {
       const lastDocument = snapshot.docs[snapshot.docs.length - 1];
       if (!lastDocument) {
@@ -55,6 +56,7 @@ function AllMentor() {
       <MentorItem id={item?.item?.mentorID} />
     </View>
   );
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoadingFull text={'Đang tải dữ liệu'} />;
   } else {
@@ -74,6 +76,12 @@ function AllMentor() {
           }
         />
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetchingByUser}
+              onRefresh={refetchByUser}
+            />
+          }
           data={list()}
           renderItem={renderItem}
           keyExtractor={item => item?.mentorID}

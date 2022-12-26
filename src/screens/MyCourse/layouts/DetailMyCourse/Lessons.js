@@ -8,7 +8,7 @@ import {
   where,
 } from 'firebase/firestore';
 import React from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 import ItemLesson from '~/components/Lessons/ItemLesson';
@@ -16,6 +16,7 @@ import MyButton from '~/components/MyButton';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 
 function Lessons({ courseId }) {
   const { theme } = useTheme();
@@ -26,7 +27,7 @@ function Lessons({ courseId }) {
     orderBy('index'),
     limit(6),
   );
-  const { data, isLoading, hasNextPage, fetchNextPage } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(['lessons-infinite', courseId], ref, snapshot => {
       const lastDocument = snapshot.docs[snapshot.docs.length - 1];
       if (!lastDocument) {
@@ -65,6 +66,7 @@ function Lessons({ courseId }) {
       <ItemLesson item={item?.item} />
     </View>
   );
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoadingFull text={'Đang tải dữ liệu...'} />;
   } else {
@@ -75,6 +77,12 @@ function Lessons({ courseId }) {
             tw`flex-1 pt-5 bg-${theme.bg} border-t border-t-gray-border pb-5`,
           ]}>
           <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefetchingByUser}
+                onRefresh={refetchByUser}
+              />
+            }
             showsVerticalScrollIndicator={false}
             data={list()}
             renderItem={renderItem}

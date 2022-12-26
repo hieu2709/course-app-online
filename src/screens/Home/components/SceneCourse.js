@@ -7,12 +7,13 @@ import {
   where,
 } from 'firebase/firestore';
 import React from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import ItemCourse from '~/components/Course/ItemCourse';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 
 function SceneCourse({ categoryId }) {
   const courseRef = collection(db, 'courses');
@@ -20,9 +21,9 @@ function SceneCourse({ categoryId }) {
   const ref = categoryId
     ? query(courseRef, where('categoryId', '==', categoryId), limit(4))
     : query(courseRef, limit(4));
-  const { data, isLoading, hasNextPage, fetchNextPage } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
-      ['course-infinite', categoryId || 'all'],
+      ['all-course-infinite', categoryId || 'all'],
       ref,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];
@@ -60,17 +61,21 @@ function SceneCourse({ categoryId }) {
       <ItemCourse courseId={item?.item?.courseID} />
     </View>
   );
-  // data?.docs?.map(d => console.log(d.data()));
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoading text={'Đang tải...'} />;
   } else {
     return (
       <FlatList
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetchingByUser}
+            onRefresh={refetchByUser}
+          />
+        }
         data={list()}
         renderItem={renderItem}
-        keyExtractor={item => {
-          item?.courseID;
-        }}
+        keyExtractor={(item, i) => i}
         onEndReached={loadMore}
         ListFooterComponent={renderLoader}
       />

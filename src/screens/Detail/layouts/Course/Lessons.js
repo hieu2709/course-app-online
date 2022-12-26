@@ -1,6 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import ItemLesson from '~/components/Lessons/ItemLesson';
@@ -9,6 +15,7 @@ import { collection, limit, orderBy, query, where } from 'firebase/firestore';
 import { db } from '~/firebase/config';
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import MyLoading from '~/base/components/MyLoading';
+import { useRefreshByUser } from '~/utils/hooks';
 
 function Lessons() {
   const { theme } = useTheme();
@@ -20,11 +27,11 @@ function Lessons() {
     orderBy('index'),
     limit(5),
   );
-  const { data, isLoading } = useFirestoreQuery(
+  const { data, isLoading, refetch, isFetching } = useFirestoreQuery(
     ['lesson-limit', course.courseID],
     ref,
   );
-
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   const navigation = useNavigation();
   const goToAllLessons = () => {
     navigation.navigate('AllLessons', { course });
@@ -44,6 +51,12 @@ function Lessons() {
           </TouchableOpacity>
         </View>
         <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetchingByUser}
+              onRefresh={refetchByUser}
+            />
+          }
           style={tw`flex-1`}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}>

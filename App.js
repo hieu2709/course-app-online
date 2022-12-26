@@ -10,6 +10,7 @@ import store from '~/redux/store';
 import { MenuProvider } from 'react-native-popup-menu';
 import { ThemeProvider } from '~/ThemeProvider';
 import { UserProvider } from '~/UserProvider';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -24,17 +25,19 @@ export default function App() {
   } else {
     return (
       <RootSiblingParent>
-        <ThemeProvider>
-          <UserProvider>
-            <SafeAreaProvider>
-              <Provider store={store}>
-                <MenuProvider>
-                  <MainNavigator />
-                </MenuProvider>
-              </Provider>
-            </SafeAreaProvider>
-          </UserProvider>
-        </ThemeProvider>
+        <PaperProvider>
+          <ThemeProvider>
+            <UserProvider>
+              <SafeAreaProvider>
+                <Provider store={store}>
+                  <MenuProvider>
+                    <MainNavigator />
+                  </MenuProvider>
+                </Provider>
+              </SafeAreaProvider>
+            </UserProvider>
+          </ThemeProvider>
+        </PaperProvider>
       </RootSiblingParent>
     );
   }
