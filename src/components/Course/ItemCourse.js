@@ -9,6 +9,7 @@ import React from 'react';
 import { useRef } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
+import MyToast from '~/base/components/MyToast';
 import Icon from '~/base/Icon';
 import MyButton from '~/components/MyButton';
 import { db } from '~/firebase/config';
@@ -25,6 +26,7 @@ function ItemCourse({ courseId, canPress = true }) {
   const navigation = useNavigation();
   const modalRef = useRef();
   const { user } = useUser();
+  const toastRef = useRef();
   const docRef = doc(
     db,
     'mycourse',
@@ -89,6 +91,7 @@ function ItemCourse({ courseId, canPress = true }) {
           isBookmark: true,
         };
         mutationCourse.mutate(param);
+        toastRef?.current?.open(true, 'Đã đánh dấu khóa học này!');
       }
     } else {
       const params = {
@@ -98,6 +101,7 @@ function ItemCourse({ courseId, canPress = true }) {
         status: 0,
       };
       mutationCourse.mutate(params);
+      toastRef?.current?.open(true, 'Đã đánh dấu khóa học này!');
     }
   };
   const handleCloseModal = () => {
@@ -110,6 +114,7 @@ function ItemCourse({ courseId, canPress = true }) {
     };
     mutationCourse.mutate(param);
     modalRef?.current?.close();
+    toastRef?.current?.open(false, 'Đã bỏ đánh dấu khóa học này!');
   };
   const onPress = () => {
     if (canPress) {
@@ -126,6 +131,7 @@ function ItemCourse({ courseId, canPress = true }) {
         disabled={!canPress}
         onPress={() => onPress()}
         style={tw`flex-row mx-5 bg-${theme.bgInput} p-5 rounded-3xl shadow-lg mt-5`}>
+        <MyToast ref={toastRef} />
         <MyImage
           style={tw`w-30 h-30 rounded-xl`}
           src={{ uri: course?.data()?.image }}

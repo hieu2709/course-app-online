@@ -13,12 +13,13 @@ import {
   where,
 } from 'firebase/firestore';
 import React from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, RefreshControl } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import ItemCourse from '~/components/Course/ItemCourse';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 import MentorItem from '../All/components/MentorItem';
 
 function SearchMentor({ search }) {
@@ -30,7 +31,7 @@ function SearchMentor({ search }) {
     endAt(search + '\uf8ff'),
     limit(4),
   );
-  const { data, isLoading, hasNextPage, fetchNextPage } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
       ['mentor-search-infinite', search],
       ref,
@@ -73,6 +74,7 @@ function SearchMentor({ search }) {
       <MentorItem id={item?.item?.mentorID} />
     </View>
   );
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoading text={'Đang tìm kiếm'} />;
   } else {
@@ -83,11 +85,25 @@ function SearchMentor({ search }) {
         </View>
         <View style={tw`mx-5 rounded-full h-1 bg-blue`} />
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetchingByUser}
+              onRefresh={refetchByUser}
+            />
+          }
           data={list()}
           renderItem={renderItem}
           keyExtractor={item => item?.mentorID}
           onEndReached={loadMore}
           ListFooterComponent={renderLoader}
+          ListEmptyComponent={
+            <View>
+              <Text
+                style={tw`font-qs-semibold text-base text-center mt-2 text-${theme.text}`}>
+                Không tìm thấy kết quả nào
+              </Text>
+            </View>
+          }
         />
       </View>
     );

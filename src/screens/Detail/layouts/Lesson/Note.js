@@ -1,13 +1,9 @@
-import ReadMore from '@fawazahmed/react-native-read-more';
 import {
   useFirestoreCollectionMutation,
-  useFirestoreDocument,
-  useFirestoreDocumentMutation,
   useFirestoreInfiniteQuery,
 } from '@react-query-firebase/firestore';
 import {
   collection,
-  doc,
   limit,
   orderBy,
   query,
@@ -33,7 +29,7 @@ import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
-import { convertSecondtoHours } from '~/utils';
+
 import { useRefreshByUser } from '~/utils/hooks';
 import NoteItem from '../../components/NoteItem';
 
@@ -45,12 +41,13 @@ function Note({ lessonId, videoRef, pause, resume }) {
   const myNoteRef = query(
     collection(db, 'mynote'),
     where('lessonId', '==', lessonId),
+    where('userId', '==', user?.userId),
     orderBy('dateCreated', 'asc'),
     limit(10),
   );
   const { data, isLoading, hasNextPage, fetchNextPage, refetch, isRefetching } =
     useFirestoreInfiniteQuery(
-      ['lesson-note-infinite', lessonId],
+      ['lesson-note-infinite', lessonId?.toString(), user?.userId?.toString()],
       myNoteRef,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];

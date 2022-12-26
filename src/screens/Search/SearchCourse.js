@@ -1,7 +1,4 @@
-import {
-  useFirestoreInfiniteQuery,
-  useFirestoreQuery,
-} from '@react-query-firebase/firestore';
+import { useFirestoreInfiniteQuery } from '@react-query-firebase/firestore';
 import {
   collection,
   endAt,
@@ -13,12 +10,13 @@ import {
   where,
 } from 'firebase/firestore';
 import React from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, RefreshControl } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import ItemCourse from '~/components/Course/ItemCourse';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 
 function SearchCourse({ search, categoryId }) {
   const { theme } = useTheme();
@@ -39,7 +37,7 @@ function SearchCourse({ search, categoryId }) {
           where('categoryId', '==', categoryId),
           limit(4),
         );
-  const { data, isLoading, hasNextPage, fetchNextPage } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
       ['course-search-infinite', search, categoryId],
       ref,
@@ -75,6 +73,7 @@ function SearchCourse({ search, categoryId }) {
     }
   };
   const renderItem = item => <ItemCourse courseId={item?.item?.courseID} />;
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoading text={'Đang tìm kiếm'} />;
   } else {
@@ -85,11 +84,25 @@ function SearchCourse({ search, categoryId }) {
         </View>
         <View style={tw`mx-5 rounded-full h-1 bg-blue`} />
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetchingByUser}
+              onRefresh={refetchByUser}
+            />
+          }
           data={list()}
           renderItem={renderItem}
           keyExtractor={item => item?.courseID}
           onEndReached={loadMore}
           ListFooterComponent={renderLoader}
+          ListEmptyComponent={
+            <View>
+              <Text
+                style={tw`font-qs-semibold text-base text-center mt-2 text-${theme.text}`}>
+                Không tìm thấy kết quả nào
+              </Text>
+            </View>
+          }
         />
       </View>
     );
