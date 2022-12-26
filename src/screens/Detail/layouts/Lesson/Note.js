@@ -1,20 +1,31 @@
 import ReadMore from '@fawazahmed/react-native-read-more';
 import {
+  useFirestoreCollectionMutation,
   useFirestoreDocument,
   useFirestoreDocumentMutation,
+  useFirestoreInfiniteQuery,
 } from '@react-query-firebase/firestore';
-import { collection, doc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  Timestamp,
+  where,
+} from 'firebase/firestore';
 import React, { useRef, useState } from 'react';
 import {
   Keyboard,
-  KeyboardAvoidingView,
-  ScrollView,
-  Text,
+  FlatList,
   TouchableOpacity,
   View,
+  RefreshControl,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MyLoading from '~/base/components/MyLoading';
+import MyLoadingFull from '~/base/components/MyLoadingFull';
 import MyToast from '~/base/components/MyToast';
 import Icon from '~/base/Icon';
 import MyTextInput from '~/components/MyTextInput';
@@ -23,23 +34,75 @@ import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 import { convertSecondtoHours } from '~/utils';
+import { useRefreshByUser } from '~/utils/hooks';
+import NoteItem from '../../components/NoteItem';
 
 function Note({ lessonId, videoRef, pause, resume }) {
   const { theme } = useTheme();
   const [note, setNote] = useState('');
   const { user } = useUser();
   const toastRef = useRef();
-  const myLessonRef = doc(
-    collection(db, 'mylesson'),
-    user?.userId?.toString() + lessonId?.toString(),
+  const myNoteRef = query(
+    collection(db, 'mynote'),
+    where('lessonId', '==', lessonId),
+    orderBy('dateCreated', 'asc'),
+    limit(10),
   );
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch, isRefetching } =
+    useFirestoreInfiniteQuery(
+      ['lesson-note-infinite', lessonId],
+      myNoteRef,
+      snapshot => {
+        const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+        if (!lastDocument) {
+          return;
+        } else {
+          return query(myNoteRef, startAfter(lastDocument));
+        }
+      },
+    );
+  const list = () => {
+    let paginatedData = [];
+    data?.pages?.forEach(page => {
+      page?.docs?.forEach(char => {
+        paginatedData.push(char);
+      });
+    });
+    return paginatedData;
+  };
+  const renderLoader = () => {
+    if (hasNextPage) {
+      return <MyLoading />;
+    } else {
+      return null;
+    }
+  };
+  const loadMore = () => {
+    // console.log("load more", hasNextPage);
+    if (hasNextPage) {
+      fetchNextPage();
+    }
+  };
+  const seekToTime = time => {
+    videoRef?.current?.seekTo(time, true);
+  };
+  const renderItem = item => {
+    return (
+      <View
+        style={tw`px-5 py-1 bg-${
+          item?.index % 2 === 0 ? `${theme.bgInput}` : 'transparent'
+        } justify-center `}>
+        <NoteItem item={item?.item} seekTo={seekToTime} refetch={refetch} />
+      </View>
+    );
+  };
 
-  const { data: myLesson, isLoading } = useFirestoreDocument(
-    ['myLesson', user?.userId?.toString() + lessonId?.toString()],
-    myLessonRef,
-    { subscribe: true },
+  const mutation = useFirestoreCollectionMutation(
+    query(collection(db, 'mynote')),
+    {
+      onSettled: refetch,
+    },
   );
-  const mutation = useFirestoreDocumentMutation(myLessonRef, { merge: true });
   const submitNote = () => {
     // console.log('submit');
     videoRef?.current
@@ -47,13 +110,11 @@ function Note({ lessonId, videoRef, pause, resume }) {
       .then(time => {
         if (note) {
           mutation?.mutate({
-            notes: [
-              ...(myLesson?.data()?.notes || []),
-              {
-                time: time,
-                note: note,
-              },
-            ],
+            userId: user?.userId,
+            lessonId,
+            note,
+            time,
+            dateCreated: Timestamp.fromDate(new Date()),
           });
           setNote('');
           Keyboard.dismiss();
@@ -68,15 +129,14 @@ function Note({ lessonId, videoRef, pause, resume }) {
         ),
       );
   };
-  const seekToTime = time => {
-    videoRef?.current?.seekTo(time, true);
-  };
+
   const onFocusTextInput = () => {
     pause?.();
   };
   const onBlurTextInput = () => {
     resume?.();
   };
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
@@ -89,32 +149,21 @@ function Note({ lessonId, videoRef, pause, resume }) {
         extraScrollHeight={10}>
         <View style={tw`flex-1`}>
           <MyToast ref={toastRef} />
-          <ScrollView
+          <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefetchingByUser}
+                onRefresh={refetchByUser}
+              />
+            }
             style={tw`flex-1 mb-2`}
-            contentContainerStyle={tw`mx-5 pt-2  pb-5`}>
-            {myLesson?.data()?.notes?.map((n, i) => (
-              <View key={i} style={tw`flex-row`}>
-                <TouchableOpacity onPress={() => seekToTime(n?.time)}>
-                  <Text style={tw`font-qs-semibold text-base text-blue`}>
-                    {convertSecondtoHours(n?.time)}
-                  </Text>
-                </TouchableOpacity>
-                <Text style={tw`font-qs-medium text-base text-${theme.text}`}>
-                  {' '}
-                  :{' '}
-                </Text>
-                <ReadMore
-                  seeMoreText="Xem thêm"
-                  seeMoreStyle={tw`text-green`}
-                  seeLessText="Ẩn bớt"
-                  numberOfLines={2}
-                  style={tw`font-qs-regular text-base text-${theme.text}`}
-                  wrapperStyle={tw`flex-1`}>
-                  {n?.note}
-                </ReadMore>
-              </View>
-            ))}
-          </ScrollView>
+            contentContainerStyle={tw` pt-2  pb-5`}
+            data={list()}
+            renderItem={renderItem}
+            keyExtractor={(item, i) => i}
+            onEndReached={loadMore}
+            ListFooterComponent={renderLoader}
+          />
           <View style={tw` mb-5 pl-5 pr-2 flex-row `}>
             <MyTextInput
               value={note}
@@ -137,6 +186,7 @@ function Note({ lessonId, videoRef, pause, resume }) {
               />
             </TouchableOpacity>
           </View>
+          {isRefetching && <MyLoadingFull />}
         </View>
       </KeyboardAwareScrollView>
     );

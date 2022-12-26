@@ -8,7 +8,7 @@ import {
   startAfter,
   where,
 } from 'firebase/firestore';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import ItemReview from '~/components/Review/ItemReview';
 import { db } from '~/firebase/config';
@@ -16,6 +16,7 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+import { useRefreshByUser } from '~/utils/hooks';
 
 function ReviewSearch({ rateSearch, courseId, index }) {
   const { theme } = useTheme();
@@ -84,12 +85,19 @@ function ReviewSearch({ rateSearch, courseId, index }) {
       </View>
     );
   };
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
     return (
       <View style={tw`flex-1`}>
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetchingByUser}
+              onRefresh={refetchByUser}
+            />
+          }
           data={list()}
           renderItem={renderItem}
           keyExtractor={(item, i) => i}

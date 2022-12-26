@@ -1,10 +1,11 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { collection, limit, query, where } from 'firebase/firestore';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import { db } from '~/firebase/config';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 import ItemCourse from './ItemCourse';
 
 function SceneCourse({ categoryId }) {
@@ -12,12 +13,13 @@ function SceneCourse({ categoryId }) {
   const ref = categoryId
     ? query(courseRef, where('categoryId', '==', categoryId), limit(4))
     : query(courseRef, limit(4));
-  const { data, isLoading } = useFirestoreQuery(
-    ['course-limit', categoryId || 'all'],
+  const { data, isLoading, refetch, isFetching } = useFirestoreQuery(
+    ['course-limit-', categoryId || 'all'],
     ref,
     { subscribe: true },
   );
-  // data?.docs?.map(d => console.log(d.data()));
+  // console.log(isFetching);
+
   if (isLoading) {
     return <MyLoading text={'Đang tải...'} />;
   } else {

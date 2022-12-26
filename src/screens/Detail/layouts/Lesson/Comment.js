@@ -1,7 +1,6 @@
 import {
   useFirestoreCollectionMutation,
   useFirestoreInfiniteQuery,
-  useFirestoreQuery,
 } from '@react-query-firebase/firestore';
 import {
   collection,
@@ -15,9 +14,16 @@ import {
 import React from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
-import { TouchableOpacity, View, FlatList, Keyboard } from 'react-native';
+import {
+  TouchableOpacity,
+  View,
+  FlatList,
+  Keyboard,
+  RefreshControl,
+} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MyLoading from '~/base/components/MyLoading';
+import MyLoadingFull from '~/base/components/MyLoadingFull';
 import MyToast from '~/base/components/MyToast';
 import Icon from '~/base/Icon';
 import MyTextInput from '~/components/MyTextInput';
@@ -25,21 +31,22 @@ import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 import CommentItem from '../../components/CommentItem';
 
-function Comment({ lessonId, videoRef, pause, resume }) {
+function Comment({ lessonId }) {
   const { theme } = useTheme();
   const [comment, setComment] = useState('');
   const { user } = useUser();
   const toastRef = useRef();
-
+  const inputRef = useRef();
   const myCommentRef = query(
     collection(db, 'mycomment'),
     where('lessonId', '==', lessonId),
     orderBy('dateCreated', 'desc'),
     limit(5),
   );
-  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch, isRefetching } =
     useFirestoreInfiniteQuery(
       ['lesson-comment-infinite', lessonId],
       myCommentRef,
@@ -56,12 +63,11 @@ function Comment({ lessonId, videoRef, pause, resume }) {
     let paginatedData = [];
     data?.pages?.forEach(page => {
       page?.docs?.forEach(char => {
-        paginatedData.push(char?.data());
+        paginatedData.push(char);
       });
     });
     return paginatedData;
   };
-  // console.log(list());
   const renderLoader = () => {
     if (hasNextPage) {
       return <MyLoading />;
@@ -75,11 +81,18 @@ function Comment({ lessonId, videoRef, pause, resume }) {
       fetchNextPage();
     }
   };
-  const renderItem = item => (
-    <View style={tw` mx-5 my-1 py-2  justify-center rounded`}>
-      <CommentItem comment={item?.item} />
-    </View>
-  );
+  const renderItem = item => {
+    return (
+      <View style={tw` mx-5 my-1 py-2  justify-center rounded`}>
+        <CommentItem
+          item={item?.item}
+          refetch={refetch}
+          inputRef={inputRef}
+          onChangeText={setComment}
+        />
+      </View>
+    );
+  };
 
   const mutation = useFirestoreCollectionMutation(
     query(collection(db, 'mycomment')),
@@ -97,11 +110,12 @@ function Comment({ lessonId, videoRef, pause, resume }) {
         dateCreated: Timestamp.fromDate(new Date()),
         comment: comment,
       };
-      mutation?.mutate(param);
       setComment('');
+      mutation?.mutate(param);
       Keyboard.dismiss();
     }
   };
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
@@ -115,6 +129,12 @@ function Comment({ lessonId, videoRef, pause, resume }) {
         <View style={tw`flex-1`}>
           <MyToast ref={toastRef} />
           <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefetchingByUser}
+                onRefresh={refetchByUser}
+              />
+            }
             style={tw`flex-1 mb-2`}
             contentContainerStyle={tw` pt-2  pb-5`}
             data={list()}
@@ -125,6 +145,7 @@ function Comment({ lessonId, videoRef, pause, resume }) {
           />
           <View style={tw` mb-5 pl-5 pr-2 flex-row `}>
             <MyTextInput
+              ref={inputRef}
               value={comment}
               onChangeText={v => {
                 setComment(v);
@@ -145,6 +166,7 @@ function Comment({ lessonId, videoRef, pause, resume }) {
               />
             </TouchableOpacity>
           </View>
+          {isRefetching && <MyLoadingFull />}
         </View>
       </KeyboardAwareScrollView>
     );

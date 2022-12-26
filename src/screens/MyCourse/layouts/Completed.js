@@ -7,13 +7,14 @@ import {
   where,
 } from 'firebase/firestore';
 import React from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
+import { useRefreshByUser } from '~/utils/hooks';
 import Courses from '../components/Courses';
 
 function Completed() {
@@ -26,7 +27,7 @@ function Completed() {
     where('status', '==', 2),
     limit(5),
   );
-  const { data, isLoading, hasNextPage, fetchNextPage } =
+  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
       ['my-course-completed-infinite', user?.userId || ''],
       Query,
@@ -73,12 +74,19 @@ function Completed() {
       </View>
     );
   };
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
     return (
       <View style={tw`flex-1`}>
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetchingByUser}
+              onRefresh={refetchByUser}
+            />
+          }
           data={list()}
           renderItem={renderItem}
           keyExtractor={item =>

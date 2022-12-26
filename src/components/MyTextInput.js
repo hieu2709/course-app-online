@@ -95,6 +95,7 @@ function MyTextInput(
         )}
       </View>
       <TextInput
+        ref={ref}
         onFocus={() => {
           setIsFocus(true);
           onFocus?.();

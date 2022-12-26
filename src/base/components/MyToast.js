@@ -4,6 +4,7 @@ import { forwardRef } from 'react';
 import { useImperativeHandle } from 'react';
 import { useState } from 'react';
 import { Animated, Text } from 'react-native';
+import { Portal } from 'react-native-paper';
 import tw from '~/libs/tailwind';
 
 function MyToast({ style }, ref) {
@@ -45,25 +46,27 @@ function MyToast({ style }, ref) {
     return null;
   } else {
     return (
-      <Animated.View
-        style={[
-          tw`px-10 h-12 bg-${
-            statuss ? 'green' : 'red'
-          }  z-1000 absolute justify-center items-center rounded-3xl top-5 right-5`,
-          style,
-          {
-            transform: [
-              {
-                translateX: anim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [250, 0],
-                }),
-              },
-            ],
-          },
-        ]}>
-        <Text style={tw`font-qs-bold text-white`}>{textt || null}</Text>
-      </Animated.View>
+      <Portal>
+        <Animated.View
+          style={[
+            tw`px-10 h-12 bg-${
+              statuss ? 'green' : 'red'
+            }  z-1000 absolute justify-center items-center rounded-3xl top-15 right-5`,
+            style,
+            {
+              transform: [
+                {
+                  translateX: anim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [250, 0],
+                  }),
+                },
+              ],
+            },
+          ]}>
+          <Text style={tw`font-qs-bold text-white`}>{textt || null}</Text>
+        </Animated.View>
+      </Portal>
     );
   }
 }
