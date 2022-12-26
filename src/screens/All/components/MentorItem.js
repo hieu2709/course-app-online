@@ -14,11 +14,12 @@ function MentorItem({ id }) {
   const { data, isLoading } = useFirestoreDocument(['mentor', id], ref);
   const navigation = useNavigation();
   const { theme } = useTheme();
-  const goToDetailMentor = id => {
+  const goToDetailMentor = () => {
     navigation.navigate('DetailMentor', {
       dataId: id,
     });
   };
+
   if (isLoading) {
     return <MyLoading />;
   } else {
@@ -26,7 +27,7 @@ function MentorItem({ id }) {
       <TouchableOpacity>
         <View style={tw`flex-row px-5 items-center `}>
           <TouchableOpacity
-            onPress={() => goToDetailMentor(data?.data()?.mentorID)}
+            onPress={() => goToDetailMentor()}
             style={tw`flex-row flex-1 items-center`}>
             <MyImage
               src={{

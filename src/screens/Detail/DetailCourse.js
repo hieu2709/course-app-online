@@ -29,30 +29,38 @@ import {
 import { formatNumber } from '~/utils';
 import MyToast from '~/base/components/MyToast';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
+import { useState } from 'react';
 
 function DetailCourse({ navigation, route }) {
-  const { data } = route.params;
+  const { dataId } = route.params;
   const { theme } = useTheme();
   const { user, setUser } = useUser();
   const modalRef = useRef();
   const notEnoughMoneyRef = useRef();
   const enrollCourseRef = useRef();
   const toastRef = useRef();
+  const [loading, setLoading] = useState(false);
+  const courseRef = doc(collection(db, 'courses'), dataId?.toString());
+  const { data: course, isLoading: isLoadingCourse } = useFirestoreDocument(
+    ['course', dataId],
+    courseRef,
+  );
+
   const lessonsRef = query(
     collection(db, 'lessons'),
-    where('courseId', '==', data?.courseID),
+    where('courseId', '==', dataId),
   );
   const { data: lessons, isLoading: isLoadingLessons } = useFirestoreQuery(
-    ['lessons', data?.courseID],
+    ['lessons', dataId],
     lessonsRef,
     { subscribe: true },
   );
   const reviewRef = query(
     collection(db, 'myreview'),
-    where('courseId', '==', data?.courseID),
+    where('courseId', '==', dataId),
   );
   const { data: reviews, isLoading: isLoadingReview } = useFirestoreQuery(
-    ['review', data?.courseID],
+    ['review', dataId],
     reviewRef,
     { subscribe: true },
   );
@@ -61,39 +69,29 @@ function DetailCourse({ navigation, route }) {
       return total + current?.data()?.rate;
     }, 0) / reviews?.docs?.length || false;
 
-  const myCourseRef = query(
-    collection(db, 'mycourse'),
-    where('courseId', '==', data?.courseID),
-    where('status', '!=', 0),
-  );
-  const { data: listMyCourse, isLoading: isLoadingListMyCourse } =
-    useFirestoreQuery(['mycourse-enroll', data?.courseID], myCourseRef, {
-      subscribe: true,
-    });
-
   const totalTime = lessons?.docs?.reduce((total, current) => {
     return total + current?.data()?.time;
   }, 0);
   const docRef = doc(
     db,
     'mycourse',
-    user?.userId?.toString() + data.courseID.toString(),
+    user?.userId?.toString() + dataId.toString(),
   );
   const {
     data: myCourse,
     isLoading: isLoadingMyCourse,
     refetch,
   } = useFirestoreDocument(
-    ['mycourse', user?.userId?.toString() + data.courseID.toString()],
+    ['mycourse', user?.userId?.toString() + dataId.toString()],
     docRef,
   );
   const lessonFirstRef = query(
     collection(db, 'lessons'),
-    where('courseId', '==', data?.courseID),
+    where('courseId', '==', dataId),
     where('index', '==', 1),
   );
   const { data: lessonsFirst, isLoading: isLoadingLessonFirst } =
-    useFirestoreQuery(['lessonFirst', data.courseID], lessonFirstRef, {
+    useFirestoreQuery(['lessonFirst', dataId], lessonFirstRef, {
       subscribe: true,
     });
   const mutationCourse = useFirestoreDocumentMutation(
@@ -116,7 +114,7 @@ function DetailCourse({ navigation, route }) {
     } else {
       const params = {
         userId: user.userId,
-        courseId: data.courseID,
+        courseId: dataId,
         isBookmark: true,
         status: 0,
       };
@@ -136,7 +134,7 @@ function DetailCourse({ navigation, route }) {
   };
   const handleCheckCoins = () => {
     const coins = user?.coins;
-    if (coins >= data?.price) {
+    if (coins >= course?.data()?.price) {
       enrollCourseRef?.current?.open();
     } else {
       notEnoughMoneyRef?.current?.open();
@@ -148,7 +146,7 @@ function DetailCourse({ navigation, route }) {
   };
   const setCoinsUser = () => {
     try {
-      const newMycoins = user?.coins - data?.price;
+      const newMycoins = user?.coins - course?.data()?.price;
       const userParam = {
         ...user,
         coins: newMycoins,
@@ -164,6 +162,7 @@ function DetailCourse({ navigation, route }) {
     enrollCourseRef?.current?.close();
   };
   const handleEnrollCourse = async () => {
+    setLoading(true);
     const docsnap = await getDoc(docRef);
     if (docsnap.exists()) {
       const param = {
@@ -175,7 +174,7 @@ function DetailCourse({ navigation, route }) {
     } else {
       const params = {
         userId: user.userId,
-        courseId: data.courseID,
+        courseId: dataId,
         isBookmark: false,
         status: 1,
       };
@@ -183,7 +182,7 @@ function DetailCourse({ navigation, route }) {
       setCoinsUser();
     }
     const userId = user?.userId;
-    const mentorId = data?.mentorID;
+    const mentorId = course?.data()?.mentorID;
     await setDoc(doc(db, 'class', userId?.toString() + mentorId?.toString()), {
       userId,
       mentorID: mentorId,
@@ -201,9 +200,15 @@ function DetailCourse({ navigation, route }) {
         status: 0,
       },
     );
+
+    setDoc(
+      courseRef,
+      { studentCount: course?.data()?.studentCount + 1 },
+      { merge: true },
+    );
+    setLoading(false);
   };
   if (
-    isLoadingListMyCourse ||
     isLoadingMyCourse ||
     isLoadingLessons ||
     isLoadingReview ||
@@ -214,11 +219,10 @@ function DetailCourse({ navigation, route }) {
     return (
       <Container>
         <CourseProvider
-          course={data}
+          course={course?.data()}
           rate={avgRate}
           countLesson={lessons?.docs?.length}
           totalTime={totalTime}
-          countStudent={listMyCourse?.docs?.length}
           review={reviews?.docs?.length}>
           <View style={tw`flex-1`}>
             <View style={tw`flex-1`}>
@@ -236,111 +240,107 @@ function DetailCourse({ navigation, route }) {
                 <ButtonEnrolCourse onPress={handleCheckCoins} />
               )}
             </View>
-
-            <BottomModal ref={modalRef}>
-              <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
-                <View
-                  style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
-                  <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-                    Bỏ đánh dấu khóa học này?
-                  </Text>
-                </View>
-                <ItemCourse courseId={data?.courseID} canPress={false} />
-                <View
-                  style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
-                  <MyButton
-                    title={'Hủy'}
-                    style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
-                    titleColor={tw.color('blue')}
-                    onPress={() => handleCloseModal(modalRef)}
-                  />
-                  <MyButton
-                    title={'Bỏ đánh dấu'}
-                    style={tw`flex-1 h-14 bg-blue ml-2`}
-                    titleColor={tw.color('white')}
-                    onPress={handleRemoveBookmark}
-                  />
-                </View>
-              </View>
-            </BottomModal>
-            <BottomModal ref={notEnoughMoneyRef}>
-              <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
-                <View
-                  style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
-                  <View>
-                    <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-                      Bạn không đủ tiền để mua khóa học này!
-                    </Text>
-                  </View>
-                  <View
-                    style={tw`flex-row items-center justify-center w-[96%]`}>
-                    <Text
-                      style={tw`font-qs-regular text-sm text-${theme.text}`}>
-                      Số tiền hiện tại: {formatNumber(user?.coins)} đ
-                    </Text>
-                    {/* <Text style={tw`font-qs-regular text-xs text-${theme.text}`}>
-                    Course price: {formatNumber(data?.price)} đ
-                  </Text> */}
-                  </View>
-                </View>
-                <ItemCourse courseId={data?.courseID} canPress={false} />
-                <View
-                  style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
-                  <MyButton
-                    title={'Hủy'}
-                    style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
-                    titleColor={tw.color('blue')}
-                    onPress={() => handleCloseModal(notEnoughMoneyRef)}
-                  />
-                  <MyButton
-                    title={'Tới nạp tiền'}
-                    style={tw`flex-1 h-14 bg-blue ml-2`}
-                    titleColor={tw.color('white')}
-                    onPress={goToTransaction}
-                  />
-                </View>
-              </View>
-            </BottomModal>
-            <BottomModal ref={enrollCourseRef}>
-              <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
-                <View
-                  style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
-                  <View>
-                    <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
-                      Bạn chắc chắn muốn mua khóa học này?
-                    </Text>
-                  </View>
-                  <View
-                    style={tw`flex-row items-center justify-center w-[96%]`}>
-                    <Text
-                      style={tw`font-qs-regular text-sm text-${theme.text}`}>
-                      Số tiền hiện tại: {formatNumber(user?.coins)} đ
-                    </Text>
-                    {/* <Text style={tw`font-qs-regular text-xs text-${theme.text}`}>
-                    Course price: {formatNumber(data?.price)} đ
-                  </Text> */}
-                  </View>
-                </View>
-                <ItemCourse courseId={data?.courseID} canPress={false} />
-                <View
-                  style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
-                  <MyButton
-                    title={'Hủy'}
-                    style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
-                    titleColor={tw.color('blue')}
-                    onPress={() => handleCloseModal(enrollCourseRef)}
-                  />
-                  <MyButton
-                    title={'Đồng ý'}
-                    style={tw`flex-1 h-14 bg-blue ml-2`}
-                    titleColor={tw.color('white')}
-                    onPress={handleEnrollCourse}
-                  />
-                </View>
-              </View>
-            </BottomModal>
           </View>
         </CourseProvider>
+        {loading && <MyLoadingFull />}
+        <BottomModal ref={modalRef}>
+          <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
+            <View
+              style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
+              <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
+                Bỏ đánh dấu khóa học này?
+              </Text>
+            </View>
+            <ItemCourse courseId={dataId} canPress={false} />
+            <View
+              style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
+              <MyButton
+                title={'Hủy'}
+                style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
+                titleColor={tw.color('blue')}
+                onPress={() => handleCloseModal(modalRef)}
+              />
+              <MyButton
+                title={'Bỏ đánh dấu'}
+                style={tw`flex-1 h-14 bg-blue ml-2`}
+                titleColor={tw.color('white')}
+                onPress={handleRemoveBookmark}
+              />
+            </View>
+          </View>
+        </BottomModal>
+        <BottomModal ref={notEnoughMoneyRef}>
+          <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
+            <View
+              style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
+              <View>
+                <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
+                  Bạn không đủ tiền để mua khóa học này!
+                </Text>
+              </View>
+              <View style={tw`flex-row items-center justify-center w-[96%]`}>
+                <Text style={tw`font-qs-regular text-sm text-${theme.text}`}>
+                  Số tiền hiện tại: {formatNumber(user?.coins)} đ
+                </Text>
+                {/* <Text style={tw`font-qs-regular text-xs text-${theme.text}`}>
+                    Course price: {formatNumber(data?.price)} đ
+                  </Text> */}
+              </View>
+            </View>
+            <ItemCourse courseId={dataId} canPress={false} />
+            <View
+              style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
+              <MyButton
+                title={'Hủy'}
+                style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
+                titleColor={tw.color('blue')}
+                onPress={() => handleCloseModal(notEnoughMoneyRef)}
+              />
+              <MyButton
+                title={'Tới nạp tiền'}
+                style={tw`flex-1 h-14 bg-blue ml-2`}
+                titleColor={tw.color('white')}
+                onPress={goToTransaction}
+              />
+            </View>
+          </View>
+        </BottomModal>
+        <BottomModal ref={enrollCourseRef}>
+          <View style={tw`pb-10 rounded-t-3xl bg-${theme.bg}`}>
+            <View
+              style={tw`py-5 items-center mx-5 border-b-[0.2px] border-gray`}>
+              <View>
+                <Text style={tw`font-qs-bold text-lg text-${theme.text}`}>
+                  Bạn chắc chắn muốn mua khóa học này?
+                </Text>
+              </View>
+              <View style={tw`flex-row items-center justify-center w-[96%]`}>
+                <Text style={tw`font-qs-regular text-sm text-${theme.text}`}>
+                  Số tiền hiện tại: {formatNumber(user?.coins)} đ
+                </Text>
+                {/* <Text style={tw`font-qs-regular text-xs text-${theme.text}`}>
+                    Course price: {formatNumber(data?.price)} đ
+                  </Text> */}
+              </View>
+            </View>
+            <ItemCourse courseId={dataId} canPress={false} />
+            <View
+              style={tw`flex-row items-center h-16 mt-6 overflow-hidden px-5`}>
+              <MyButton
+                title={'Hủy'}
+                style={tw`flex-1 h-14 bg-blueOpacity mr-2`}
+                titleColor={tw.color('blue')}
+                onPress={() => handleCloseModal(enrollCourseRef)}
+              />
+              <MyButton
+                title={'Đồng ý'}
+                style={tw`flex-1 h-14 bg-blue ml-2`}
+                titleColor={tw.color('white')}
+                onPress={handleEnrollCourse}
+              />
+            </View>
+          </View>
+        </BottomModal>
       </Container>
     );
   }

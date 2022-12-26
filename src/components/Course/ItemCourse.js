@@ -114,7 +114,7 @@ function ItemCourse({ courseId, canPress = true }) {
   const onPress = () => {
     if (canPress) {
       navigation.navigate('DetailCourse', {
-        data: course?.data(),
+        dataId: courseId,
       });
     }
   };
