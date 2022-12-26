@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
-import { collection, limit, query } from 'firebase/firestore';
+import { collection, limit, orderBy, query } from 'firebase/firestore';
 import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
@@ -13,8 +13,8 @@ function TopMentor() {
   const { theme } = useTheme();
   const navigation = useNavigation();
   const mentorRef = collection(db, 'mentors');
-  const ref = query(mentorRef, limit(2));
-  const { data, isLoading } = useFirestoreQuery(['mentors-limit'], ref);
+  const ref = query(mentorRef, orderBy('dateCreated', 'desc'), limit(4));
+  const { data, isLoading } = useFirestoreQuery(['mentors-limit-newest'], ref);
   const goToDetailMentor = id => {
     navigation.navigate('DetailMentor', {
       dataId: id,

@@ -4,6 +4,7 @@ const CourseContext = createContext();
 function CourseProvider({
   children,
   course,
+  countStudent,
   countLesson,
   totalTime,
   review,
@@ -11,7 +12,7 @@ function CourseProvider({
 }) {
   return (
     <CourseContext.Provider
-      value={{ course, countLesson, totalTime, review, rate }}>
+      value={{ course, countLesson, totalTime, review, rate, countStudent }}>
       {children}
     </CourseContext.Provider>
   );

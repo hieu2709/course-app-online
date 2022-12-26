@@ -22,8 +22,9 @@ import tw from '~/libs/tailwind';
 import { useRefreshByUser } from '~/utils/hooks';
 import MentorItem from '../All/components/MentorItem';
 
-function SearchMentor({ search }) {
+function SearchMentor({ searchValue }) {
   const { theme } = useTheme();
+  const { search } = searchValue || {};
   const ref = query(
     collection(db, 'mentors'),
     orderBy('mentorName'),

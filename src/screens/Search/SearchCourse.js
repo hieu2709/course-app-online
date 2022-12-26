@@ -18,10 +18,11 @@ import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import { useRefreshByUser } from '~/utils/hooks';
 
-function SearchCourse({ search, categoryId }) {
+function SearchCourse({ searchValue }) {
   const { theme } = useTheme();
+  const { search, cateSelect, low, high } = searchValue || {};
   const ref =
-    categoryId === 0
+    cateSelect === 0
       ? query(
           collection(db, 'courses'),
           orderBy('courseName'),
@@ -34,12 +35,13 @@ function SearchCourse({ search, categoryId }) {
           orderBy('courseName'),
           startAt(`${search}`),
           endAt(search + '\uf8ff'),
-          where('categoryId', '==', categoryId),
+          where('categoryId', '==', cateSelect),
           limit(4),
         );
+
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
-      ['course-search-infinite', search, categoryId],
+      ['course-search-infinite', search, cateSelect],
       ref,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];

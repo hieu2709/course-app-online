@@ -1,5 +1,11 @@
 import { useFirestoreInfiniteQuery } from '@react-query-firebase/firestore';
-import { collection, limit, query, startAfter } from 'firebase/firestore';
+import {
+  collection,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+} from 'firebase/firestore';
 import React from 'react';
 import { FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
@@ -13,10 +19,14 @@ import tw from '~/libs/tailwind';
 import { useRefreshByUser } from '~/utils/hooks';
 import MentorItem from './components/MentorItem';
 
-function AllMentor() {
+function AllMentor({ navigation, route }) {
   const { theme } = useTheme();
   const collectionRef = collection(db, 'mentors');
-  const mentorQuery = query(collectionRef, limit(10));
+  const mentorQuery = query(
+    collectionRef,
+    orderBy('dateCreated', 'desc'),
+    limit(10),
+  );
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery('mentors-infinite', mentorQuery, snapshot => {
       const lastDocument = snapshot.docs[snapshot.docs.length - 1];
@@ -65,11 +75,11 @@ function AllMentor() {
         <Header
           title={'Tất cả giáo viên'}
           rightIcon={
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Search')}>
               <Icon
-                type="MaterialIcons"
-                name="more-horiz"
-                size={30}
+                type="Ionicons"
+                name="ios-search-outline"
+                size={26}
                 color={`${theme.text}`}
               />
             </TouchableOpacity>

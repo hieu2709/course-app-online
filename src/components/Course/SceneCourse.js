@@ -1,22 +1,26 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
-import { collection, limit, query, where } from 'firebase/firestore';
+import { collection, limit, orderBy, query, where } from 'firebase/firestore';
 import React from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import { db } from '~/firebase/config';
 import tw from '~/libs/tailwind';
-import { useRefreshByUser } from '~/utils/hooks';
 import ItemCourse from './ItemCourse';
 
 function SceneCourse({ categoryId }) {
   const courseRef = collection(db, 'courses');
   const ref = categoryId
-    ? query(courseRef, where('categoryId', '==', categoryId), limit(4))
-    : query(courseRef, limit(4));
+    ? query(
+        courseRef,
+        where('categoryId', '==', categoryId),
+        orderBy('dateCreated', 'desc'),
+        limit(4),
+      )
+    : query(courseRef, orderBy('dateCreated', 'desc'), limit(4));
   const { data, isLoading, refetch, isFetching } = useFirestoreQuery(
-    ['course-limit-', categoryId || 'all'],
+    ['course-limit-newest', categoryId || 'all'],
     ref,
-    { subscribe: true },
+    // { subscribe: true },
   );
   // console.log(isFetching);
 

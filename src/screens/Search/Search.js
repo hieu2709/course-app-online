@@ -22,7 +22,7 @@ function Search({ navigation }) {
     refFilter?.current?.close();
   };
   // console.log(searchValue);
-  const { search, cateSelect, type } = searchValue || {};
+  const { search, cateSelect, type, low, high } = searchValue || {};
   return (
     <Container>
       <View style={tw`flex-1 bg-${theme.bg}`}>
@@ -41,9 +41,9 @@ function Search({ navigation }) {
         <View style={tw`flex-1`}>
           {searchValue &&
             (type === 0 ? (
-              <SearchCourse search={search} categoryId={cateSelect} />
+              <SearchCourse searchValue={searchValue} />
             ) : (
-              <SearchMentor search={search} />
+              <SearchMentor searchValue={searchValue} />
             ))}
         </View>
       </View>

@@ -45,7 +45,15 @@ function DetailCourse({ navigation, route }) {
     ['course', dataId],
     courseRef,
   );
-
+  const myCourseRef = query(
+    collection(db, 'mycourse'),
+    where('status', '!=', 0),
+    where('courseId', '==', dataId),
+  );
+  const { data: myCourseEnroll, isLoading: isLoadingCourseEnroll } =
+    useFirestoreQuery(['mycourse-enroll', dataId], myCourseRef, {
+      subscribe: true,
+    });
   const lessonsRef = query(
     collection(db, 'lessons'),
     where('courseId', '==', dataId),
@@ -200,19 +208,15 @@ function DetailCourse({ navigation, route }) {
         status: 0,
       },
     );
-
-    setDoc(
-      courseRef,
-      { studentCount: course?.data()?.studentCount + 1 },
-      { merge: true },
-    );
     setLoading(false);
   };
   if (
     isLoadingMyCourse ||
     isLoadingLessons ||
     isLoadingReview ||
-    isLoadingLessonFirst
+    isLoadingLessonFirst ||
+    isLoadingCourse ||
+    isLoadingCourseEnroll
   ) {
     return <MyLoadingFull text={'Đang tải dữ liệu...'} />;
   } else {
@@ -221,6 +225,7 @@ function DetailCourse({ navigation, route }) {
         <CourseProvider
           course={course?.data()}
           rate={avgRate}
+          countStudent={myCourseEnroll?.docs?.length}
           countLesson={lessons?.docs?.length}
           totalTime={totalTime}
           review={reviews?.docs?.length}>
