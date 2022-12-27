@@ -13,7 +13,7 @@ function Courses({ mentorId }) {
     ? query(courseRef, where('mentorID', '==', mentorId))
     : query(courseRef);
   const { data, isLoading } = useFirestoreQuery(
-    ['course-mentor', mentorId || 'all'],
+    ['course-mentor', mentorId?.toString() || 'all'],
     ref,
   );
 

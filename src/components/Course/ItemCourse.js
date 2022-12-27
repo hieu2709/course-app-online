@@ -7,7 +7,7 @@ import {
 import { collection, doc, getDoc, query, where } from 'firebase/firestore';
 import React from 'react';
 import { useRef } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import MyToast from '~/base/components/MyToast';
 import Icon from '~/base/Icon';
@@ -30,7 +30,7 @@ function ItemCourse({ courseId, canPress = true }) {
   const docRef = doc(
     db,
     'mycourse',
-    user?.userId?.toString() + courseId?.toString(),
+    user?.userId?.toString() + '-' + courseId?.toString(),
   );
   const courseRef = doc(db, 'courses', courseId?.toString());
   const { data: course, isLoading } = useFirestoreDocument(
@@ -71,7 +71,7 @@ function ItemCourse({ courseId, canPress = true }) {
     });
   // listMyCourse?.docs?.forEach(d => console.log(d.data()));
   const { data: myCourse, refetch } = useFirestoreDocument(
-    ['mycourse', user?.userId?.toString() + courseId?.toString()],
+    ['mycourse', user?.userId?.toString() + '-' + courseId?.toString()],
     docRef,
   );
 

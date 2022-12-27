@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '~/base/Icon';
+import MyImage from '~/components/MyImage';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
 import Container from '~/layouts/Container';
@@ -19,8 +20,8 @@ function HomePage({ navigation }) {
         <View>
           <View style={tw`flex-row justify-between items-center px-5 py-5 `}>
             <View style={tw`flex-row items-center`}>
-              <Image
-                source={require('~/assets/noavatar.png')}
+              <MyImage
+                src={user?.avatar ? { uri: user?.avatar } : null}
                 style={tw`w-14 h-14 rounded-full`}
               />
               <View style={tw`ml-4`}>

@@ -2,6 +2,7 @@ import { useFirestoreInfiniteQuery } from '@react-query-firebase/firestore';
 import {
   collection,
   limit,
+  orderBy,
   query,
   startAfter,
   where,
@@ -12,18 +13,22 @@ import MyLoading from '~/base/components/MyLoading';
 import ItemCourse from '~/components/Course/ItemCourse';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
-import tw from '~/libs/tailwind';
 import { useRefreshByUser } from '~/utils/hooks';
 
 function SceneCourse({ categoryId }) {
   const courseRef = collection(db, 'courses');
   const { theme } = useTheme();
   const ref = categoryId
-    ? query(courseRef, where('categoryId', '==', categoryId), limit(4))
-    : query(courseRef, limit(4));
+    ? query(
+        courseRef,
+        orderBy('dateCreated', 'desc'),
+        where('categoryId', '==', categoryId),
+        limit(4),
+      )
+    : query(courseRef, orderBy('dateCreated', 'desc'), limit(4));
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
-      ['all-course-infinite', categoryId || 'all'],
+      ['all-course-infinite', categoryId?.toString() || 'all'],
       ref,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];

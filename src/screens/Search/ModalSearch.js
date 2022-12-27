@@ -1,6 +1,6 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
-import { collection, limit, orderBy, query, where } from 'firebase/firestore';
-import React, { useCallback } from 'react';
+import { collection, limit, orderBy, query } from 'firebase/firestore';
+import React from 'react';
 import { useState } from 'react';
 import { Keyboard, Text, TouchableNativeFeedback, View } from 'react-native';
 import Slider from '@react-native-community/slider';
@@ -8,15 +8,11 @@ import MyLoading from '~/base/components/MyLoading';
 import MyButton from '~/components/MyButton';
 import MyTextInput from '~/components/MyTextInput';
 import RadioGroup from '~/components/RadioGroup';
-import Label from '~/components/Slider/Label';
-import Notch from '~/components/Slider/Notch';
-import Rail from '~/components/Slider/Rail';
-import RailSelected from '~/components/Slider/RailSelected';
-import Thumb from '~/components/Slider/Thumb';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import { formatNumber } from '~/utils';
+import { useEffect } from 'react';
 const typeList = [
   {
     name: 'Khóa học',
@@ -30,9 +26,8 @@ const typeList = [
 
 function ModalSearch({ close, value, setValue }) {
   const [val, setVal] = useState(value?.search || '');
-  const [low, setLow] = useState(0);
-  const [visible, setVisible] = useState(false);
-  const [high, setHigh] = useState(0);
+  const [low, setLow] = useState(value?.low || 0);
+  const [high, setHigh] = useState(value?.high || 0);
   const { theme } = useTheme();
   const [type, setType] = useState(value?.type || typeList[0].value);
   const categoryRef = query(collection(db, 'category'));
@@ -48,7 +43,12 @@ function ModalSearch({ close, value, setValue }) {
     courseRef,
     { subscribe: true },
   );
-
+  useEffect(() => {
+    if (!isLoadingCourse) {
+      setHigh(course?.docs[0]?.data().price);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingCourse]);
   const submit = () => {
     const param = {
       search: val,
@@ -105,34 +105,39 @@ function ModalSearch({ close, value, setValue }) {
                   value={low}
                   minimumTrackTintColor={tw.color('blue')}
                   maximumTrackTintColor={tw.color('gray')}
-                  onValueChange={v => setLow(v)}
-                  onSlidingStart={v => {
-                    setVisible(false);
+                  onValueChange={v => {
+                    if (v >= high) {
+                      setHigh(v);
+                    }
+                    setLow(v);
                   }}
                   onSlidingComplete={v => {
-                    setVisible(true);
-                    setHigh(v);
+                    if (high === 0) {
+                      setHigh(course?.docs[0]?.data().price);
+                    }
                   }}
+                  // upperLimit={high}
                 />
 
-                {visible && (
-                  <View>
-                    <Text
-                      style={tw`font-qs-bold text-base text-${theme.text} ml-5`}>
-                      Giá cao nhất: {formatNumber(high)} VNĐ
-                    </Text>
-                    <Slider
-                      style={tw`mx-5 h-10`}
-                      minimumValue={low}
-                      maximumValue={course?.docs[0]?.data().price}
-                      step={100000}
-                      value={high}
-                      minimumTrackTintColor={tw.color('blue')}
-                      maximumTrackTintColor={tw.color('gray')}
-                      onValueChange={v => setHigh(v)}
-                    />
-                  </View>
-                )}
+                <View>
+                  <Text
+                    style={tw`font-qs-bold text-base text-${theme.text} ml-5`}>
+                    Giá cao nhất:
+                    {formatNumber(high)} VNĐ
+                  </Text>
+                  <Slider
+                    style={tw`mx-5 h-10`}
+                    minimumValue={low}
+                    maximumValue={course?.docs[0]?.data().price}
+                    step={100000}
+                    value={high}
+                    minimumTrackTintColor={tw.color('blue')}
+                    maximumTrackTintColor={tw.color('gray')}
+                    onValueChange={v => {
+                      setHigh(v);
+                    }}
+                  />
+                </View>
 
                 <Text
                   style={tw`font-qs-bold text-base text-${theme.text} ml-5`}>
@@ -158,7 +163,7 @@ function ModalSearch({ close, value, setValue }) {
               onPress={close}
             />
             <MyButton
-              title={'Tìm kiếm '}
+              title={'Tìm kiếm'}
               style={tw`flex-1 h-14 bg-blue ml-2`}
               titleColor={tw.color('white')}
               onPress={submit}

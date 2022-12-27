@@ -48,7 +48,7 @@ function Comment({ lessonId }) {
   );
   const { data, isLoading, hasNextPage, fetchNextPage, refetch, isRefetching } =
     useFirestoreInfiniteQuery(
-      ['lesson-comment-infinite', lessonId],
+      ['lesson-comment-infinite', lessonId?.toString()],
       myCommentRef,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];
@@ -84,12 +84,7 @@ function Comment({ lessonId }) {
   const renderItem = item => {
     return (
       <View style={tw` mx-5 my-1 py-2  justify-center rounded`}>
-        <CommentItem
-          item={item?.item}
-          refetch={refetch}
-          inputRef={inputRef}
-          onChangeText={setComment}
-        />
+        <CommentItem item={item?.item} refetch={refetch} />
       </View>
     );
   };

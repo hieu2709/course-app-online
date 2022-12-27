@@ -21,6 +21,7 @@ function Profile({ navigation }) {
     await clearStorage('user');
     setUser(false);
   };
+  // console.log(user);
   return (
     <Container>
       <View style={tw`flex-row justify-between items-center mx-5 mb-3 mt-5`}>
@@ -33,21 +34,10 @@ function Profile({ navigation }) {
             Hồ sơ cá nhân
           </Text>
         </View>
-        <TouchableOpacity
-          style={tw`h-6 w-6 justify-center items-center rounded-full border-[1.5px] border-${theme.text}`}>
-          <Icon
-            type="MaterialIcons"
-            name="more-horiz"
-            size={16}
-            color={theme.text}
-          />
-        </TouchableOpacity>
       </View>
       <View style={tw`items-center pb-5 border-b border-gray-border mx-5`}>
         <MyImage
-          src={{
-            uri: 'https://scr.vn/wp-content/uploads/2020/08/%E1%BA%A2nh-hot-girl-l%C3%A0m-avt.jpg',
-          }}
+          src={user?.avatar ? { uri: user?.avatar } : null}
           style={tw`w-22 h-22 rounded-full mt-5`}
         />
         <Text style={tw`font-qs-bold mt-3 text-xl text-${theme.text}`}>
@@ -100,22 +90,7 @@ function Profile({ navigation }) {
           }
           title={'Ngôn ngữ'}
         />
-        <TouchableOpacity
-          style={tw`flex-row justify-between items-center mx-5 py-2.5 border-b-[0.2px] border-gray-border`}>
-          <View style={tw`flex-row items-center`}>
-            <View style={tw`w-10 justify-center`}>
-              <Icon
-                type="FontAwesome"
-                name="moon-o"
-                size={22}
-                color={theme.text}
-              />
-            </View>
-            <Text style={tw`font-qs-semibold text-base text-${theme.text}`}>
-              Chế độ tối
-            </Text>
-          </View>
-        </TouchableOpacity>
+
         <TouchableOpacity
           style={tw`flex-row justify-between items-center mx-5 py-2.5 `}
           onPress={logout}>

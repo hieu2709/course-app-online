@@ -1,11 +1,10 @@
 import React from 'react';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { Text } from 'react-native';
+import { TabView, TabBar } from 'react-native-tab-view';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
 import Courses from './Courses';
-import Reviews from './Reviews';
 import Students from './Students';
 
 function MyTabBar({ mentorId }) {

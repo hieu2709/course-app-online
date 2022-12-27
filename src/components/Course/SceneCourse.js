@@ -1,7 +1,7 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { collection, limit, orderBy, query, where } from 'firebase/firestore';
 import React from 'react';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import { db } from '~/firebase/config';
 import tw from '~/libs/tailwind';
@@ -17,7 +17,7 @@ function SceneCourse({ categoryId }) {
         limit(4),
       )
     : query(courseRef, orderBy('dateCreated', 'desc'), limit(4));
-  const { data, isLoading, refetch, isFetching } = useFirestoreQuery(
+  const { data, isLoading } = useFirestoreQuery(
     ['course-limit-newest', categoryId || 'all'],
     ref,
     // { subscribe: true },

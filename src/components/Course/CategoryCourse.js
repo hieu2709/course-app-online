@@ -1,5 +1,5 @@
 import { useFirestoreDocument } from '@react-query-firebase/firestore';
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { db } from '~/firebase/config';

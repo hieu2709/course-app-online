@@ -17,7 +17,7 @@ function About() {
   const navigation = useNavigation();
   const q = doc(collection(db, 'mentors'), course?.mentorID?.toString());
   const { data: mentor, isLoading } = useFirestoreDocument(
-    ['mentor', course?.mentorID],
+    ['mentor', course?.mentorID?.toString()],
     q,
   );
   const goToDetailMentor = id => {

@@ -1,26 +1,13 @@
-import { useFirestoreDocumentMutation } from '@react-query-firebase/firestore';
-import { collection, doc, Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
-import {
-  Keyboard,
-  Text,
-  TextInput,
-  View,
-  TouchableOpacity,
-} from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Icon from '~/base/Icon';
+import { Keyboard, Text, TextInput, View } from 'react-native';
 import MyButton from '~/components/MyButton';
-import MyTextInput from '~/components/MyTextInput';
-import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
-import useUser from '~/hooks/useUser';
 import tw from '~/libs/tailwind';
 
 function ModalEditComment({ modalRef, mutation, value, deleteComment }) {
   const { theme } = useTheme();
   const [comment, setComment] = useState(value);
-  const { user } = useUser();
   const closeModal = () => {
     Keyboard.dismiss();
     modalRef?.current?.closeModal();

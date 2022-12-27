@@ -26,7 +26,7 @@ function ModalEditReview({ close, courseId, review, rate, refetch }) {
   };
   const myreviewRef = doc(
     collection(db, 'myreview'),
-    user?.userId?.toString() + courseId?.toString(),
+    user?.userId?.toString() + '-' + courseId?.toString(),
   );
   const mutation = useFirestoreDocumentMutation(
     myreviewRef,

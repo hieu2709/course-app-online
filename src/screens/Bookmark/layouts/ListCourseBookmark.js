@@ -1,12 +1,11 @@
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { collection, query, where } from 'firebase/firestore';
 import React from 'react';
-import { RefreshControl, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 import ItemCourse from '~/components/Course/ItemCourse';
 import { db } from '~/firebase/config';
 import useUser from '~/hooks/useUser';
-import { useRefreshByUser } from '~/utils/hooks';
 
 function ListCourseBookmark() {
   const { user } = useUser();
@@ -16,11 +15,11 @@ function ListCourseBookmark() {
     where('isBookmark', '==', true),
     where('userId', '==', user?.userId || ''),
   );
-  const {
-    data: myCourseBookmark,
-    isLoading,
-    refetch,
-  } = useFirestoreQuery(['mycourse-bookmark'], q, { subscribe: true });
+  const { data: myCourseBookmark, isLoading } = useFirestoreQuery(
+    ['mycourse-bookmark', user?.userId?.toString()],
+    q,
+    { subscribe: true },
+  );
   if (isLoading) {
     return <MyLoadingFull text={'Đang tải dữ liệu'} />;
   } else {

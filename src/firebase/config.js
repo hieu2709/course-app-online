@@ -1,5 +1,6 @@
-import { initializeApp } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 const firebaseConfig = {
   apiKey: 'AIzaSyDPYj5GHrIpzA2xTs6s5OgUCd-UFwpX_mU',
   authDomain: 'course-app-b3e97.firebaseapp.com',
@@ -11,5 +12,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+if (!getApps().length) {
+  initializeApp(firebaseConfig);
+}
+// const app = initializeApp(firebaseConfig);
+export const db = getFirestore();
+export const storage = getStorage();

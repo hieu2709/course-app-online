@@ -1,7 +1,5 @@
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from '~/base/Icon';
+import { Image, Text, View } from 'react-native';
 import useTheme from '~/hooks/useTheme';
 import Container from '~/layouts/Container';
 import tw from '~/libs/tailwind';
@@ -20,25 +18,6 @@ function MyCourse() {
           <Text style={tw`ml-3 font-qs-bold text-xl text-${theme.text}`}>
             Khóa học của tôi
           </Text>
-        </View>
-        <View style={tw`flex-row items-center`}>
-          <TouchableOpacity>
-            <Icon
-              type="AntDesign"
-              name="search1"
-              size={26}
-              color={theme.text}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={tw`h-6 w-6 ml-5 justify-center items-center rounded-full border-[1.5px] border-${theme.text}`}>
-            <Icon
-              type="MaterialIcons"
-              name="more-horiz"
-              size={16}
-              color={theme.text}
-            />
-          </TouchableOpacity>
         </View>
       </View>
       <MyTabView />

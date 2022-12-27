@@ -1,18 +1,9 @@
-import { async } from '@firebase/util';
 import { useNavigation } from '@react-navigation/native';
 import {
   useFirestoreDocument,
   useFirestoreQuery,
 } from '@react-query-firebase/firestore';
-import {
-  collection,
-  doc,
-  getCountFromServer,
-  getDocs,
-  onSnapshot,
-  query,
-  where,
-} from 'firebase/firestore';
+import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
@@ -29,10 +20,9 @@ function Courses({ courseId }) {
   const { user } = useUser();
   const navigation = useNavigation();
   const [lessonsCompleted, setLessonsCompleted] = useState(0);
-
   const courseRef = doc(collection(db, 'courses'), courseId?.toString());
   const { data: course, isLoading: isLoadingCourse } = useFirestoreDocument(
-    ['course', courseId],
+    ['course', courseId?.toString()],
     courseRef,
   );
   const lessonsRef = query(
@@ -40,31 +30,41 @@ function Courses({ courseId }) {
     where('courseId', '==', courseId || ''),
   );
   const { data: lessons, isLoading: isLoadingLesson } = useFirestoreQuery(
-    ['lessons', courseId],
+    ['lessons', courseId?.toString()],
     lessonsRef,
     { subscribe: true },
   );
+  const myLessonRef = query(
+    collection(db, 'mylesson'),
+    where('userId', '==', user?.userId),
+    where('status', '==', 1),
+  );
+  const { data: mylessonsCompleted, isLoading: isLoadingMyLesson } =
+    useFirestoreQuery(
+      ['mylesson-completed', user?.userId?.toString()],
+      myLessonRef,
+      { subscribe: true },
+    );
 
   useEffect(() => {
     const listLessonId = lessons?.docs?.map(d => {
       return d?.data()?.lessonId;
     });
-    const getListLessonCompleted = async () => {
-      const ref = query(
-        collection(db, 'mylesson'),
-        where('lessonId', 'in', listLessonId),
-        where('userId', '==', user?.userId),
-        where('status', '==', 1),
-      );
-      onSnapshot(ref, s => {
-        setLessonsCompleted(s?.docs?.length);
+    const getListLessonCompleted = () => {
+      const list = [];
+      mylessonsCompleted?.docs?.map(d => {
+        listLessonId?.map(id => {
+          if (id === d?.data()?.lessonId) {
+            list.push(d?.data());
+          }
+        });
       });
-      // setLessonsCompleted(snapshot?.docs?.length);
+      setLessonsCompleted(list?.length);
     };
     if (listLessonId) {
       getListLessonCompleted();
     }
-  }, [lessons?.docs, user?.userId]);
+  }, [lessons?.docs, user?.userId, mylessonsCompleted?.docs]);
   const totalTime = lessons?.docs?.reduce((total, current) => {
     return total + current?.data()?.time;
   }, 0);
@@ -91,7 +91,7 @@ function Courses({ courseId }) {
       data: item,
     });
   };
-  if (isLoadingCourse || isLoadingLesson) {
+  if (isLoadingCourse || isLoadingLesson || isLoadingMyLesson) {
     return <MyLoading text={'Đang tải dữ liệu'} />;
   } else {
     return (

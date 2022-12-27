@@ -17,6 +17,7 @@ function TabBarCourse() {
     { key: 'design3d', title: '3D Design' },
     { key: 'bussiness', title: 'Kinh doanh' },
     { key: 'programming', title: 'Lập trình' },
+    { key: 'music', title: 'Âm nhạc' },
   ]);
   const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
@@ -28,7 +29,8 @@ function TabBarCourse() {
         return <SceneCourse jumpTo={jumpTo} categoryId={2} />;
       case 'programming':
         return <SceneCourse jumpTo={jumpTo} categoryId={3} />;
-
+      case 'music':
+        return <SceneCourse jumpTo={jumpTo} categoryId={4} />;
       default:
         return null;
     }

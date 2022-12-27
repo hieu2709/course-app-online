@@ -27,8 +27,8 @@ function Lessons() {
     orderBy('index'),
     limit(5),
   );
-  const { data, isLoading, refetch, isFetching } = useFirestoreQuery(
-    ['lesson-limit', course.courseID],
+  const { data, isLoading, refetch } = useFirestoreQuery(
+    ['lesson-limit', course?.courseID?.toString()],
     ref,
   );
   const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);

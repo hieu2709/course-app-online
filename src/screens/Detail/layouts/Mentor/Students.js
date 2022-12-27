@@ -9,7 +9,10 @@ import tw from '~/libs/tailwind';
 
 function Students({ mentorId }) {
   const ref = query(collection(db, 'class'), where('mentorID', '==', mentorId));
-  const { data, isLoading } = useFirestoreQuery(['users-class', mentorId], ref);
+  const { data, isLoading } = useFirestoreQuery(
+    ['users-class', mentorId?.toString()],
+    ref,
+  );
   if (isLoading) {
     return <MyLoading text={'Đang tải dữ liệu...'} />;
   } else {

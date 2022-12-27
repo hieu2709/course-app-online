@@ -29,7 +29,7 @@ function ModalReview({ close, courseId }) {
   };
   const myreviewRef = doc(
     collection(db, 'myreview'),
-    user?.userId?.toString() + courseId?.toString(),
+    user?.userId?.toString() + '-' + courseId?.toString(),
   );
   const mutation = useFirestoreDocumentMutation(
     myreviewRef,

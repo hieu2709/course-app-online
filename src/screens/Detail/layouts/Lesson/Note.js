@@ -47,7 +47,10 @@ function Note({ lessonId, videoRef, pause, resume }) {
   );
   const { data, isLoading, hasNextPage, fetchNextPage, refetch, isRefetching } =
     useFirestoreInfiniteQuery(
-      ['lesson-note-infinite', lessonId?.toString(), user?.userId?.toString()],
+      [
+        'lesson-note-infinite',
+        lessonId?.toString() + '-' + user?.userId?.toString(),
+      ],
       myNoteRef,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];

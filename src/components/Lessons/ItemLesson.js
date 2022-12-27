@@ -25,10 +25,10 @@ function ItemLesson({ item, style }) {
   };
   const myLessonRef = doc(
     collection(db, 'mylesson'),
-    user?.userId?.toString() + item?.lessonId?.toString(),
+    user?.userId?.toString() + '-' + item?.lessonId?.toString(),
   );
   const { data: myLesson, isLoading } = useFirestoreDocument(
-    ['myLesson', user?.userId?.toString() + item?.lessonId?.toString()],
+    ['myLesson', user?.userId?.toString() + '-' + item?.lessonId?.toString()],
     myLessonRef,
     { subscribe: true },
   );

@@ -37,7 +37,7 @@ function ReviewSearch({ rateSearch, courseId, index }) {
 
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
-      ['review-infinite', courseId, rateSearch],
+      ['review-infinite', courseId?.toString() + '-' + rateSearch?.toString()],
       reviewRef,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];

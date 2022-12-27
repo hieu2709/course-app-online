@@ -12,7 +12,6 @@ import { FlatList, RefreshControl, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
 import ItemLesson from '~/components/Lessons/ItemLesson';
-import MyButton from '~/components/MyButton';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import tw from '~/libs/tailwind';
@@ -28,14 +27,18 @@ function Lessons({ courseId }) {
     limit(6),
   );
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
-    useFirestoreInfiniteQuery(['lessons-infinite', courseId], ref, snapshot => {
-      const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-      if (!lastDocument) {
-        return;
-      } else {
-        return query(ref, startAfter(lastDocument));
-      }
-    });
+    useFirestoreInfiniteQuery(
+      ['lessons-infinite', courseId?.toString()],
+      ref,
+      snapshot => {
+        const lastDocument = snapshot.docs[snapshot.docs.length - 1];
+        if (!lastDocument) {
+          return;
+        } else {
+          return query(ref, startAfter(lastDocument));
+        }
+      },
+    );
   const list = () => {
     let paginatedData = [];
     data?.pages?.forEach(page => {

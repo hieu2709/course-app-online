@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useFirestoreQuery } from '@react-query-firebase/firestore';
 import { collection, limit, orderBy, query } from 'firebase/firestore';
 import React from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import MyImage from '~/components/MyImage';
 import { db } from '~/firebase/config';

@@ -1,12 +1,13 @@
-import { useFirestoreInfiniteQuery } from '@react-query-firebase/firestore';
+import {
+  useFirestoreInfiniteQuery,
+  useFirestoreQuery,
+} from '@react-query-firebase/firestore';
 import {
   collection,
-  endAt,
   limit,
   orderBy,
   query,
   startAfter,
-  startAt,
   where,
 } from 'firebase/firestore';
 import React from 'react';
@@ -23,57 +24,48 @@ function SearchCourse({ searchValue }) {
   const { search, cateSelect, low, high } = searchValue || {};
   const ref =
     cateSelect === 0
-      ? query(
-          collection(db, 'courses'),
-          orderBy('courseName'),
-          startAt(`${search}`),
-          endAt(search + '\uf8ff'),
-          limit(4),
-        )
+      ? query(collection(db, 'courses'), orderBy('dateCreated'))
       : query(
           collection(db, 'courses'),
-          orderBy('courseName'),
-          startAt(`${search}`),
-          endAt(search + '\uf8ff'),
+          orderBy('dateCreated'),
           where('categoryId', '==', cateSelect),
-          limit(4),
         );
 
-  const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
-    useFirestoreInfiniteQuery(
-      ['course-search-infinite', search, cateSelect],
-      ref,
-      snapshot => {
-        const lastDocument = snapshot.docs[snapshot.docs.length - 1];
-        if (!lastDocument) {
-          return;
-        } else {
-          return query(ref, startAfter(lastDocument));
-        }
-      },
-    );
+  const { data, isLoading, refetch } = useFirestoreQuery(
+    ['course-search', cateSelect?.toString()],
+    ref,
+  );
   const list = () => {
     let paginatedData = [];
-    data?.pages?.forEach(page => {
-      page?.docs?.forEach(char => {
-        paginatedData.push(char?.data());
-      });
+    data?.docs?.forEach(char => {
+      if (search) {
+        if (
+          char
+            ?.data()
+            ?.courseName?.toLowerCase()
+            ?.indexOf(search?.toLowerCase()) > -1
+        ) {
+          if (low === 0) {
+            paginatedData.push(char?.data());
+          } else {
+            if (char?.data()?.price >= low && char?.data()?.price <= high) {
+              paginatedData.push(char?.data());
+            }
+          }
+        }
+      } else {
+        if (low === 0) {
+          paginatedData.push(char?.data());
+        } else {
+          if (char?.data()?.price >= low && char?.data()?.price <= high) {
+            paginatedData.push(char?.data());
+          }
+        }
+      }
     });
     return paginatedData;
   };
-  const renderLoader = () => {
-    if (hasNextPage) {
-      return <MyLoading />;
-    } else {
-      return null;
-    }
-  };
-  const loadMore = () => {
-    // console.log("load more", hasNextPage);
-    if (hasNextPage) {
-      fetchNextPage();
-    }
-  };
+
   const renderItem = item => <ItemCourse courseId={item?.item?.courseID} />;
   const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
   if (isLoading) {
@@ -86,6 +78,7 @@ function SearchCourse({ searchValue }) {
         </View>
         <View style={tw`mx-5 rounded-full h-1 bg-blue`} />
         <FlatList
+          contentContainerStyle={tw`pb-10`}
           refreshControl={
             <RefreshControl
               refreshing={isRefetchingByUser}
@@ -95,8 +88,6 @@ function SearchCourse({ searchValue }) {
           data={list()}
           renderItem={renderItem}
           keyExtractor={item => item?.courseID}
-          onEndReached={loadMore}
-          ListFooterComponent={renderLoader}
           ListEmptyComponent={
             <View>
               <Text

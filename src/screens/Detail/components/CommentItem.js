@@ -1,5 +1,4 @@
 import ReadMore from '@fawazahmed/react-native-read-more';
-import { async } from '@firebase/util';
 import {
   useFirestoreDocument,
   useFirestoreDocumentMutation,
@@ -7,7 +6,7 @@ import {
 import dayjs from 'dayjs';
 import { collection, deleteDoc, doc } from 'firebase/firestore';
 import React, { useRef } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Text, View } from 'react-native';
 import {
   Menu,
   MenuOption,
@@ -24,14 +23,14 @@ import tw from '~/libs/tailwind';
 import ModalCenter from '~/modals/ModalCenter';
 import ModalEditComment from './ModalEditComment';
 
-function CommentItem({ item, refetch, inputRef, onChangeText }) {
+function CommentItem({ item, refetch }) {
   const { theme } = useTheme();
   const { user: currentUser } = useUser();
   const comment = item?.data();
   const modalRef = useRef();
   const userRef = doc(collection(db, 'users'), comment?.userId?.toString());
   const { data: user, isLoading } = useFirestoreDocument(
-    ['user', comment?.userId],
+    ['user', comment?.userId?.toString()],
     userRef,
     { subscribe: true },
   );

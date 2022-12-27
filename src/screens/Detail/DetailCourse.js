@@ -42,7 +42,7 @@ function DetailCourse({ navigation, route }) {
   const [loading, setLoading] = useState(false);
   const courseRef = doc(collection(db, 'courses'), dataId?.toString());
   const { data: course, isLoading: isLoadingCourse } = useFirestoreDocument(
-    ['course', dataId],
+    ['course', dataId?.toString()],
     courseRef,
   );
   const myCourseRef = query(
@@ -51,7 +51,7 @@ function DetailCourse({ navigation, route }) {
     where('courseId', '==', dataId),
   );
   const { data: myCourseEnroll, isLoading: isLoadingCourseEnroll } =
-    useFirestoreQuery(['mycourse-enroll', dataId], myCourseRef, {
+    useFirestoreQuery(['mycourse-enroll', dataId?.toString()], myCourseRef, {
       subscribe: true,
     });
   const lessonsRef = query(
@@ -59,7 +59,7 @@ function DetailCourse({ navigation, route }) {
     where('courseId', '==', dataId),
   );
   const { data: lessons, isLoading: isLoadingLessons } = useFirestoreQuery(
-    ['lessons', dataId],
+    ['lessons', dataId?.toString()],
     lessonsRef,
     { subscribe: true },
   );
@@ -68,7 +68,7 @@ function DetailCourse({ navigation, route }) {
     where('courseId', '==', dataId),
   );
   const { data: reviews, isLoading: isLoadingReview } = useFirestoreQuery(
-    ['review', dataId],
+    ['review', dataId?.toString()],
     reviewRef,
     { subscribe: true },
   );
@@ -83,14 +83,14 @@ function DetailCourse({ navigation, route }) {
   const docRef = doc(
     db,
     'mycourse',
-    user?.userId?.toString() + dataId.toString(),
+    user?.userId?.toString() + '-' + dataId.toString(),
   );
   const {
     data: myCourse,
     isLoading: isLoadingMyCourse,
     refetch,
   } = useFirestoreDocument(
-    ['mycourse', user?.userId?.toString() + dataId.toString()],
+    ['mycourse', user?.userId?.toString() + '-' + dataId.toString()],
     docRef,
   );
   const lessonFirstRef = query(
@@ -99,7 +99,7 @@ function DetailCourse({ navigation, route }) {
     where('index', '==', 1),
   );
   const { data: lessonsFirst, isLoading: isLoadingLessonFirst } =
-    useFirestoreQuery(['lessonFirst', dataId], lessonFirstRef, {
+    useFirestoreQuery(['lessonFirst', dataId?.toString()], lessonFirstRef, {
       subscribe: true,
     });
   const mutationCourse = useFirestoreDocumentMutation(
@@ -118,6 +118,7 @@ function DetailCourse({ navigation, route }) {
           isBookmark: true,
         };
         mutationCourse.mutate(param);
+        toastRef?.current?.open(true, 'Đã đánh dấu khóa học này!');
       }
     } else {
       const params = {
@@ -127,6 +128,7 @@ function DetailCourse({ navigation, route }) {
         status: 0,
       };
       mutationCourse.mutate(params);
+      toastRef?.current?.open(true, 'Đã đánh dấu khóa học này!');
     }
   };
   const handleCloseModal = ref => {
@@ -138,6 +140,7 @@ function DetailCourse({ navigation, route }) {
       isBookmark: false,
     };
     mutationCourse.mutate(param);
+    toastRef?.current?.open(false, 'Đã bỏ đánh dấu khóa học này!');
     modalRef?.current?.close();
   };
   const handleCheckCoins = () => {
@@ -191,15 +194,19 @@ function DetailCourse({ navigation, route }) {
     }
     const userId = user?.userId;
     const mentorId = course?.data()?.mentorID;
-    await setDoc(doc(db, 'class', userId?.toString() + mentorId?.toString()), {
-      userId,
-      mentorID: mentorId,
-    });
+    await setDoc(
+      doc(db, 'class', userId?.toString() + '-' + mentorId?.toString()),
+      {
+        userId,
+        mentorID: mentorId,
+      },
+    );
     await setDoc(
       doc(
         db,
         'mylesson',
         userId?.toString() +
+          '-' +
           lessonsFirst?.docs[0]?.data()?.lessonId?.toString(),
       ),
       {

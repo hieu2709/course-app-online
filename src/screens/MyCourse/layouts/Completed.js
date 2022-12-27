@@ -9,7 +9,6 @@ import {
 import React from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
-import MyLoadingFull from '~/base/components/MyLoadingFull';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
 import useUser from '~/hooks/useUser';
@@ -29,7 +28,7 @@ function Completed() {
   );
   const { data, isLoading, hasNextPage, fetchNextPage, refetch } =
     useFirestoreInfiniteQuery(
-      ['my-course-completed-infinite', user?.userId || ''],
+      ['my-course-completed-infinite', user?.userId?.toString() || ''],
       Query,
       snapshot => {
         const lastDocument = snapshot.docs[snapshot.docs.length - 1];

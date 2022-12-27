@@ -8,11 +8,9 @@ import {
   where,
 } from 'firebase/firestore';
 import React from 'react';
-import { FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import MyLoading from '~/base/components/MyLoading';
 import MyLoadingFull from '~/base/components/MyLoadingFull';
-import Icon from '~/base/Icon';
-import ButtonEnrolCourse from '~/components/ButtonEnrollCourse';
 import ItemLesson from '~/components/Lessons/ItemLesson';
 import { db } from '~/firebase/config';
 import useTheme from '~/hooks/useTheme';
@@ -82,17 +80,17 @@ function AllLesson({ navigation, route }) {
       <Container>
         <Header
           title={title}
-          rightIcon={
-            <TouchableOpacity
-              style={tw`h-6 w-6 justify-center items-center rounded-full border-[1.5px] border-${theme.text}`}>
-              <Icon
-                type="MaterialIcons"
-                name="more-horiz"
-                size={16}
-                color={theme.text}
-              />
-            </TouchableOpacity>
-          }
+          // rightIcon={
+          //   <TouchableOpacity
+          //     style={tw`h-6 w-6 justify-center items-center rounded-full border-[1.5px] border-${theme.text}`}>
+          //     <Icon
+          //       type="MaterialIcons"
+          //       name="more-horiz"
+          //       size={16}
+          //       color={theme.text}
+          //     />
+          //   </TouchableOpacity>
+          // }
         />
         <FlatList
           refreshControl={

@@ -38,9 +38,13 @@ function DetailLesson({ navigation, route }) {
     where('index', '==', data?.index + 1),
   );
   const { data: lessonsNext, isLoading } = useFirestoreQuery(
-    ['lessonNext', data?.courseId + data?.index + 1],
+    [
+      'lessonNext',
+      data?.courseId?.toString() + '-' + (data?.index + 1).toString(),
+    ],
     lessonNextRef,
   );
+
   const completedVideo = useCallback(() => {
     videoRef?.current?.getCurrentTime()?.then(async currentTime => {
       if (currentTime > data?.time * 60 * 0.7) {
@@ -48,7 +52,7 @@ function DetailLesson({ navigation, route }) {
           doc(
             db,
             'mylesson',
-            user?.userId?.toString() + data?.lessonId?.toString(),
+            user?.userId?.toString() + '-' + data?.lessonId?.toString(),
           ),
           {
             status: 1,
@@ -60,6 +64,7 @@ function DetailLesson({ navigation, route }) {
             db,
             'mylesson',
             user?.userId?.toString() +
+              '-' +
               lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
           );
           const docSnap = await getDoc(docRef);
@@ -69,6 +74,7 @@ function DetailLesson({ navigation, route }) {
                 db,
                 'mylesson',
                 user?.userId?.toString() +
+                  '-' +
                   lessonsNext?.docs[0]?.data()?.lessonId?.toString(),
               ),
               {
@@ -80,11 +86,12 @@ function DetailLesson({ navigation, route }) {
           }
           navigation.goBack();
         } else {
+          console.log('xong');
           setDoc(
             doc(
               db,
               'mycourse',
-              user?.userId?.toString() + data?.courseId?.toString(),
+              user?.userId?.toString() + '-' + data?.courseId?.toString(),
             ),
             {
               status: 2,
@@ -93,7 +100,7 @@ function DetailLesson({ navigation, route }) {
           );
           const myreviewRef = doc(
             collection(db, 'myreview'),
-            user?.userId?.toString() + data?.courseId?.toString(),
+            user?.userId?.toString() + '-' + data?.courseId?.toString(),
           );
           const docSnap = await getDoc(myreviewRef);
           if (docSnap.exists()) {
